@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>声占い ✨ 大阪のおばちゃん鑑定所</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #c2185b;
+      color: #fff;
+      font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', 'Yu Gothic', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── ヒョウ柄背景（マダムシンコ風 ビビッドピンク×黒） ── */
+    .leopard-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-color: #f0006a;
+      background-image:
+        /* 黒スポット（大きめ・クッキリ） */
+        radial-gradient(ellipse 54px 36px at 45px 38px,   #000 0%,#000 60%,transparent 60%),
+        radial-gradient(ellipse 36px 54px at 120px 16px,  #000 0%,#000 60%,transparent 60%),
+        radial-gradient(ellipse 48px 32px at 175px 88px,  #000 0%,#000 60%,transparent 60%),
+        radial-gradient(ellipse 32px 48px at 70px 125px,  #000 0%,#000 60%,transparent 60%),
+        radial-gradient(ellipse 42px 26px at 155px 162px, #000 0%,#000 60%,transparent 60%),
+        radial-gradient(ellipse 26px 42px at 14px 175px,  #000 0%,#000 60%,transparent 60%),
+        radial-gradient(ellipse 24px 36px at 200px 40px,  #000 0%,#000 60%,transparent 60%),
+        radial-gradient(ellipse 38px 24px at 95px 210px,  #000 0%,#000 60%,transparent 60%);
+      background-size: 225px 225px;
+      opacity: 1;
+    }
+    .leopard-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg,
+        rgba(255,20,147,0.12) 0%, transparent 50%,
+        rgba(255,0,100,0.10) 100%);
+      animation: pink-shimmer 3s infinite alternate;
+    }
+    @keyframes pink-shimmer { from{opacity:.6} to{opacity:1} }
+
+    .overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: rgba(0,0,0,0.28);
+    }
+
+    .stars {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      pointer-events: none; z-index: 0;
+    }
+    .star {
+      position: absolute; background: #fff; border-radius: 50%;
+      animation: twinkle var(--d,3s) infinite alternate;
+    }
+    @keyframes twinkle { from{opacity:.1} to{opacity:1} }
+
+    .container {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 2rem 1rem 4rem;
+      max-width: 640px; width: 100%;
+    }
+
+    /* ── タイトル ── */
+    h1 {
+      font-size: clamp(3rem,11vw,4.5rem);
+      font-weight: 900; color: #ff1493;
+      text-shadow:
+        -3px -3px 0 #000, 3px -3px 0 #000,
+        -3px  3px 0 #000, 3px  3px 0 #000,
+         7px  7px 0 #ffd700;
+      margin-bottom: .3rem;
+      animation: h1-shake 1.8s infinite alternate; line-height: 1.1;
+    }
+    @keyframes h1-shake {
+      from{transform:scale(1) rotate(-1.5deg)} to{transform:scale(1.04) rotate(1.5deg)}
+    }
+    .subtitle {
+      color: #ffd700; font-size: clamp(1rem,4vw,1.3rem);
+      font-weight: bold; margin-bottom: 2.5rem; text-shadow: 2px 2px 0 #000;
+    }
+
+    /* ── マイクエリア ── */
+    .mic-area { display:flex; flex-direction:column; align-items:center; gap:1rem; }
+    .mic-btn {
+      width:180px; height:180px; border-radius:50%;
+      border:5px solid #ffd700; cursor:pointer;
+      background:radial-gradient(circle at 35% 35%,#ff6ef7,#7c3aed);
+      box-shadow:0 0 40px #7c3aed88,0 0 80px #a78bfa44,5px 5px 0 #000;
+      font-size:4.5rem; outline:none; position:relative;
+    }
+    .mic-btn:not(.recording){animation:char-idle 2s infinite alternate;}
+    @keyframes char-idle{from{transform:scale(1) rotate(-3deg)}to{transform:scale(1.04) rotate(3deg)}}
+    .mic-btn:hover:not(:disabled){transform:scale(1.1)!important;animation:none!important;}
+    .mic-btn:disabled{cursor:default;opacity:.7;animation:none!important;}
+    .mic-btn.recording{
+      background:radial-gradient(circle at 35% 35%,#f472b6,#dc2626);
+      box-shadow:0 0 40px #dc262688,0 0 80px #f472b644;
+      animation:pulse-rec .8s infinite alternate!important;
+    }
+    @keyframes pulse-rec{
+      from{transform:scale(1);box-shadow:0 0 40px #dc262688;}
+      to{transform:scale(1.08);box-shadow:0 0 70px #dc2626cc;}
+    }
+    @keyframes pulse{
+      from{transform:scale(1);box-shadow:0 0 40px #dc262688,0 0 80px #f472b644;}
+      to{transform:scale(1.08);box-shadow:0 0 60px #dc2626cc,0 0 120px #f472b666;}
+    }
+
+    .countdown {
+      font-size:2rem; font-weight:900; color:#ffd700;
+      min-height:2.5rem; text-shadow:2px 2px 0 #000;
+    }
+    .waveform {
+      display:flex; align-items:center; gap:4px; height:60px;
+      opacity:0; transition:opacity .3s;
+    }
+    .waveform.active{opacity:1;}
+    .bar {
+      width:6px; background:linear-gradient(to top,#7c3aed,#f472b6);
+      border-radius:3px; height:10px; transition:height .05s;
+    }
+    .status-text {
+      font-size:clamp(.9rem,3.5vw,1.05rem); color:#fbbf24;
+      min-height:1.5em; font-weight:bold; text-shadow:1px 1px 0 #000;
+    }
+    .status-text.error{color:#f87171;}
+
+    /* ── 分析パネル ── */
+    #analysis-panel {
+      display:none; margin-top:1.5rem;
+      background:rgba(0,0,0,.82); border:3px solid #ffd70099;
+      border-radius:16px; padding:1.2rem 1.5rem; text-align:left;
+    }
+    .analysis-title {
+      font-size:.9rem; color:#ffd700; margin-bottom:.8rem;
+      text-align:center; letter-spacing:2px; font-weight:bold;
+    }
+    .metric {
+      display:flex; align-items:center; margin-bottom:.6rem;
+      font-size:.85rem; color:#e2d9f3; gap:.5rem;
+    }
+    .metric-label{min-width:8rem;font-weight:bold;}
+    .metric-bar-bg{flex:1;height:8px;background:#1a0a00;border-radius:4px;overflow:hidden;}
+    .metric-bar-fill{
+      height:100%; background:linear-gradient(90deg,#ffd700,#ff1493);
+      border-radius:4px; width:0%; transition:width 1s ease;
+    }
+    .metric-bar-fill.error-flash{background:#dc2626;transition:none;}
+    .metric-val{
+      font-size:.78rem; color:#ffd700; width:5rem;
+      text-align:right; font-variant-numeric:tabular-nums; font-weight:bold;
+    }
+    .metric-val.error{color:#dc2626;font-weight:bold;animation:blink .3s infinite;}
+    @keyframes blink{50%{opacity:0}}
+
+    /* ── 確認ボタン ── */
+    #confirm-area{display:none;margin-top:1.5rem;animation:fadeSlide .5s ease;}
+    .confirm-btn {
+      background:linear-gradient(135deg,#ff1493,#ff6b00);
+      border:4px solid #000; color:#fff;
+      padding:1.2rem 2.5rem; border-radius:16px;
+      font-size:clamp(1.1rem,4vw,1.4rem); font-weight:900;
+      cursor:pointer; box-shadow:6px 6px 0 #000;
+      text-shadow:2px 2px 0 #000;
+      animation:confirm-pulse .9s infinite alternate; white-space:nowrap;
+    }
+    @keyframes confirm-pulse{
+      from{transform:scale(1);box-shadow:6px 6px 0 #000;}
+      to{transform:scale(1.05);box-shadow:8px 8px 0 #000;}
+    }
+    .confirm-btn:hover{transform:translate(-2px,-2px) scale(1.06)!important;box-shadow:8px 8px 0 #000!important;animation:none!important;}
+    .confirm-hint{font-size:.8rem;color:#fbbf2466;margin-top:.5rem;text-shadow:1px 1px 0 #000;}
+
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ══════════════════════════════
+       運勢カード
+    ══════════════════════════════ */
+    #fortune-card {
+      display:none; margin-top:1.5rem;
+      background:linear-gradient(160deg,rgba(8,0,20,.97) 0%,rgba(4,0,12,.98) 100%);
+      border:6px solid #ffd700; border-radius:24px;
+      padding:1.4rem 1rem 2rem;
+      animation:fadeSlide .6s ease; text-align:center;
+      box-shadow:0 0 60px #ffd70055,8px 8px 0 #000;
+      overflow:visible;
+    }
+    .fortune-header{
+      font-size:.85rem; color:#ffd700; letter-spacing:4px;
+      margin-bottom:.5rem; text-shadow:0 0 8px #ffd70088; font-weight:bold;
+    }
+
+    /* 1. 煽りテキスト（主役級） */
+    .odan-text {
+      font-size:clamp(2.2rem,8.5vw,4rem);
+      font-weight:900; color:#fff200; text-align:center;
+      margin:.3rem 0 .8rem; line-height:1.15;
+      display:block; width:100%;
+      word-break:break-all; overflow-wrap:break-word;
+      animation:odan-shake .7s infinite alternate;
+      text-shadow:
+        -4px -4px 0 #000, 4px -4px 0 #000,
+        -4px  4px 0 #000, 4px  4px 0 #000,
+         0    0  14px #ff1493,
+         8px  8px 0 #ff1493;
+    }
+    @keyframes odan-shake{
+      from{transform:rotate(-2.5deg) scale(1);}
+      to{transform:rotate(2.5deg) scale(1.07);}
+    }
+
+    /* 2. レアリティ */
+    .rarity-wrap{display:none;flex-direction:column;align-items:center;gap:.5rem;margin-bottom:.7rem;}
+    .rarity-badge{
+      display:inline-block; padding:.5rem 1.8rem; border-radius:24px;
+      font-size:1.3rem; font-weight:900; letter-spacing:3px;
+      border:3px solid currentColor;
+      text-shadow:0 0 10px currentColor,2px 2px 0 #000;
+      box-shadow:0 0 16px currentColor,3px 3px 0 #000;
+    }
+    .rarity-comment{
+      font-size:1.1rem; font-weight:bold; line-height:1.9;
+      text-align:center; padding:0 .5rem; color:#fff; text-shadow:1px 1px 0 #000;
+    }
+    .r-futsuu{color:#9ca3af}
+    .r-mamaa{color:#4ade80}
+    .r-rare{color:#38bdf8}
+    .r-suurare{color:#a78bfa}
+    .r-gekirare{color:#fbbf24;animation:shimmer 1.2s infinite alternate}
+    .r-noroware{color:#ef4444;animation:dark-pulse .9s infinite alternate}
+    @keyframes shimmer{
+      from{box-shadow:0 0 6px #fbbf2455;text-shadow:0 0 8px #fbbf24}
+      to{box-shadow:0 0 22px #fbbf24aa;text-shadow:0 0 18px #fbbf24}
+    }
+    @keyframes dark-pulse{
+      from{text-shadow:0 0 4px #ef444466}to{text-shadow:0 0 16px #ef4444cc}
+    }
+
+    /* 3. SFX */
+    .sfx-wrap{
+      position:relative; display:flex; justify-content:center;
+      align-items:center; margin:.2rem 0;
+    }
+    .sfx-wrap::before,.sfx-wrap::after{
+      content:'💥'; position:absolute; font-size:2.2rem;
+      animation:explode .6s infinite alternate;
+    }
+    .sfx-wrap::before{left:0;top:-6px;animation-delay:0s;}
+    .sfx-wrap::after{right:0;bottom:-6px;animation-delay:.3s;}
+    @keyframes explode{
+      from{transform:scale(.8) rotate(-10deg);opacity:.7}
+      to{transform:scale(1.3) rotate(10deg);opacity:1}
+    }
+    .sfx-display{
+      font-size:clamp(3rem,14vw,5.5rem); font-weight:900;
+      text-align:center; white-space:nowrap;
+      animation:sfx-pop .5s infinite alternate; line-height:1.1;
+      text-shadow:
+        -4px -4px 0 #fff, 4px -4px 0 #fff,
+        -4px  4px 0 #fff, 4px  4px 0 #fff,
+        -8px -8px 0 #000, 8px -8px 0 #000,
+        -8px  8px 0 #000, 8px  8px 0 #000,
+         12px 12px 0 #ffd700;
+    }
+    @keyframes sfx-pop{from{transform:scale(.97) rotate(-4deg)}to{transform:scale(1.07) rotate(2deg)}}
+
+    /* 4. 超デカ鑑定結果（主役） */
+    .fortune-title {
+      font-size:clamp(2.6rem,10.5vw,5.2rem);
+      font-weight:900; color:#ff1493; text-align:center;
+      line-height:1.2; margin:.5rem 0 .5rem; letter-spacing:1px;
+      word-break:break-all; overflow-wrap:break-word;
+      text-shadow:
+        -4px -4px 0 #000, 4px -4px 0 #000,
+        -4px  4px 0 #000, 4px  4px 0 #000,
+         0    0  16px #ff69b4,
+         8px  8px 0 #ffd700;
+      animation:title-pulse 1.0s infinite alternate;
+    }
+    @keyframes title-pulse{
+      from{transform:scale(1) rotate(-.3deg);}
+      to{transform:scale(1.04) rotate(.3deg);}
+    }
+
+    /* 5. 関西弁フレーズ */
+    .kansai-phrase {
+      font-size:clamp(1.8rem,7vw,2.8rem); font-weight:900;
+      color:#ffd700; text-align:center; margin:.2rem 0 .4rem;
+      text-shadow:
+        -2px -2px 0 #000, 2px -2px 0 #000,
+        -2px  2px 0 #000, 2px  2px 0 #000,
+         4px  4px 0 #ff1493;
+      animation:kansai-wobble .9s infinite alternate; word-break:keep-all;
+    }
+    @keyframes kansai-wobble{
+      from{transform:scale(1) rotate(-2.5deg)}to{transform:scale(1.07) rotate(2.5deg)}
+    }
+
+    /* 6. ツッコミ */
+    .tsukkomi-wrap{margin:.8rem 0;animation:fadeSlide .4s ease;}
+    .tsukkomi {
+      display:block; width:100%;
+      background:linear-gradient(135deg,#fffdf0,#fff8dc);
+      border:4px solid #ff1493; border-radius:14px;
+      padding:1rem 1.4rem;
+      font-size:clamp(1.4rem,5.5vw,2.1rem); font-weight:900;
+      color:#cc0055; text-align:center;
+      box-shadow:5px 5px 0 #000,0 0 18px #ff149344;
+      word-break:break-all; overflow-wrap:break-word;
+    }
+    .tsukkomi::before{content:'💬 ';font-size:.8em;}
+
+    /* 7. おばちゃんの秘密メモ（薄いヒョウ柄・文字可読性最優先） */
+    .voice-comment {
+      /* ベージュ地＋ごく薄いヒョウ柄（文字の邪魔をしないレベル） */
+      background-color: #f5eed8;
+      background-image:
+        radial-gradient(ellipse 18px 12px at 38px 28px,  rgba(58,32,16,.18) 0%,rgba(58,32,16,.18) 55%,transparent 55%),
+        radial-gradient(ellipse 12px 18px at 88px 14px,  rgba(74,40,16,.15) 0%,rgba(74,40,16,.15) 55%,transparent 55%),
+        radial-gradient(ellipse 16px 10px at 140px 38px, rgba(46,26, 8,.18) 0%,rgba(46,26, 8,.18) 55%,transparent 55%),
+        radial-gradient(ellipse 10px 16px at 58px 68px,  rgba(58,32,16,.15) 0%,rgba(58,32,16,.15) 55%,transparent 55%),
+        radial-gradient(ellipse 14px  9px at 112px 82px, rgba(74,40,16,.18) 0%,rgba(74,40,16,.18) 55%,transparent 55%),
+        radial-gradient(ellipse  9px 14px at 168px 22px, rgba(46,26, 8,.15) 0%,rgba(46,26, 8,.15) 55%,transparent 55%),
+        radial-gradient(ellipse 16px 11px at 22px 105px, rgba(58,32,16,.18) 0%,rgba(58,32,16,.18) 55%,transparent 55%),
+        radial-gradient(ellipse 11px 16px at 162px 68px, rgba(74,40,16,.15) 0%,rgba(74,40,16,.15) 55%,transparent 55%),
+        radial-gradient(ellipse 13px  8px at 82px 118px, rgba(46,26, 8,.18) 0%,rgba(46,26, 8,.18) 55%,transparent 55%),
+        radial-gradient(ellipse  8px 13px at 32px 148px, rgba(58,32,16,.15) 0%,rgba(58,32,16,.15) 55%,transparent 55%),
+        radial-gradient(ellipse 15px 10px at 128px 140px,rgba(74,40,16,.18) 0%,rgba(74,40,16,.18) 55%,transparent 55%),
+        radial-gradient(ellipse 10px 15px at 175px 108px,rgba(46,26, 8,.15) 0%,rgba(46,26, 8,.15) 55%,transparent 55%);
+      background-size: 190px 168px;
+      border: none;
+      border-left: 6px solid #8a5030;
+      border-radius: 0 10px 10px 0;
+      padding: 3.6rem 2.2rem 2.2rem 2.2rem;
+      font-size: clamp(1.2rem,4.5vw,1.4rem);
+      color: #1a0800;
+      font-weight: 600;
+      margin: 1.6rem 0;
+      line-height: 2.8;
+      box-shadow: 5px 8px 24px rgba(0,0,0,.45);
+      width: 100%;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      text-align: left;
+      position: relative;
+    }
+    /* ヘッダーバー */
+    .voice-comment::before {
+      content: '🔒 おばちゃんの秘密メモ';
+      display: block;
+      position: absolute; top: 0; left: 0; right: 0;
+      background: linear-gradient(90deg, #8a5030, #3a1808);
+      color: #f5ead0;
+      font-size: .85rem;
+      font-weight: 900;
+      padding: .55rem 1rem;
+      letter-spacing: 2px;
+      text-align: center;
+      border-radius: 0 10px 0 0;
+      text-shadow: 1px 1px 0 rgba(0,0,0,.4);
+    }
+    /* ピン */
+    .voice-comment::after {
+      content: '📌';
+      position: absolute; top: -16px; right: 14px;
+      font-size: 1.8rem;
+      filter: drop-shadow(1px 3px 3px rgba(0,0,0,.45));
+    }
+
+    /* 8. 詳細説明 */
+    .fortune-body-label{
+      display:block; font-size:.9rem; color:#ffd700;
+      letter-spacing:2px; margin-bottom:.5rem; font-weight:bold;
+      text-shadow:1px 1px 0 #000; text-align:left;
+    }
+    .fortune-body {
+      font-size:clamp(1.15rem,4.5vw,1.4rem); line-height:2.4;
+      color:#fff; margin:0 0 1.4rem;
+      word-break:break-word; overflow-wrap:break-word;
+      font-weight:normal; text-align:left;
+      background:rgba(0,0,0,.5); border-radius:12px;
+      padding:1.4rem 1.6rem; border-left:4px solid #ffd700;
+      text-shadow:1px 1px 0 rgba(0,0,0,.8);
+    }
+    .fortune-body p { margin:0 0 .85em; }
+    .fortune-body p:last-child { margin-bottom:0; }
+
+    /* 9. ラッキー情報（TVゲーム番組風） */
+    .lucky-header {
+      text-align:center; font-size:clamp(1rem,4vw,1.2rem); font-weight:900;
+      color:#fff;
+      background:linear-gradient(90deg,#ff1493,#ff6b00,#ffd700,#ff6b00,#ff1493);
+      background-size:300% 100%;
+      animation:lucky-flow 3s linear infinite;
+      padding:.75rem 1rem; border-radius:12px 12px 0 0;
+      border:3px solid #000; letter-spacing:3px;
+      text-shadow:2px 2px 0 #000;
+    }
+    @keyframes lucky-flow{0%{background-position:0%}100%{background-position:300%}}
+    .fortune-lucky {
+      display:flex; gap:.5rem; flex-wrap:wrap;
+      margin-bottom:1.2rem;
+      background:rgba(0,0,0,.62); border:3px solid #ff1493;
+      border-top:none; border-radius:0 0 12px 12px;
+      padding:.8rem; justify-content:center;
+    }
+    .lucky-item {
+      display:flex; flex-direction:column; align-items:center; gap:.4rem;
+      background:linear-gradient(160deg,#2d0033,#1a001a);
+      border:2px solid #ff1493; border-radius:12px;
+      padding:1rem 1rem; flex:1; min-width:110px; max-width:175px;
+      box-shadow:3px 3px 0 #000,0 0 14px #ff149344;
+    }
+    .lucky-emoji{font-size:3rem;}
+    .lucky-label{font-size:1rem;color:#ff9fcc;letter-spacing:1px;text-align:center;margin-top:.2rem;}
+    .lucky-value{
+      font-size:clamp(1.1rem,4.5vw,1.35rem); color:#fff200;
+      font-weight:900; text-align:center; word-break:break-word;
+      text-shadow:1px 1px 0 #000,0 0 8px #ff1493;
+    }
+
+    /* ポジティブメッセージ */
+    .positive-msg {
+      background:linear-gradient(135deg,#1a2a00,#0d1a00);
+      border:4px solid #4ade80; border-radius:14px;
+      padding:1.2rem; font-size:clamp(1rem,3.8vw,1.15rem);
+      font-weight:bold; color:#4ade80; text-align:center;
+      line-height:2.0; margin-bottom:1.2rem;
+      text-shadow:1px 1px 0 #000; box-shadow:4px 4px 0 #000;
+      word-break:break-word;
+    }
+    .positive-msg .pos-label{
+      font-size:.78rem; color:#4ade8077; letter-spacing:3px;
+      display:block; margin-bottom:.4rem;
+    }
+
+    /* 外れ */
+    .miss-btn{
+      background:rgba(251,191,36,.07); border:2px dashed #fbbf2488;
+      color:#fbbf24cc; border-radius:12px;
+      padding:.7rem 1rem; font-size:clamp(.9rem,3.5vw,1rem);
+      cursor:pointer; margin-bottom:.8rem; transition:all .2s;
+      width:100%; font-weight:bold;
+    }
+    .miss-btn:hover{background:rgba(251,191,36,.15);border-color:#fbbf24;color:#fbbf24;}
+    .miss-response{
+      display:none;
+      background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(251,191,36,.04));
+      border:2px solid #fbbf2455; border-radius:14px;
+      padding:1rem 1.2rem; font-size:clamp(.95rem,3.5vw,1.05rem);
+      color:#fef9c3; line-height:2.0; margin-bottom:.8rem;
+      white-space:pre-line; animation:fadeSlide .4s ease;
+      text-align:left; font-weight:bold;
+    }
+    .miss-response.visible{display:block;}
+    .miss-response strong{color:#fbbf24;}
+    .miss-again-btn{
+      background:transparent; border:none; color:#8b7dc9;
+      font-size:.85rem; cursor:pointer; text-decoration:underline;
+      padding:0; margin-bottom:.8rem; display:none;
+    }
+    .miss-again-btn.visible{display:inline;}
+
+    /* ── ボタン群（極派手） ── */
+    .btn-row{display:flex;gap:.6rem;flex-wrap:nowrap;margin-bottom:0;}
+    .retry-btn,.share-btn{
+      flex:1; padding:1.1rem .7rem; border-radius:14px;
+      cursor:pointer; font-size:clamp(.9rem,3.5vw,1.05rem);
+      font-weight:900; transition:all .15s; text-align:center;
+      white-space:nowrap;
+    }
+    .retry-btn{
+      background:linear-gradient(135deg,#5500cc,#aa00ff,#7c3aed);
+      border:4px solid #000; color:#fff; box-shadow:5px 5px 0 #000,0 0 18px #aa00ff55;
+      text-shadow:1px 1px 0 #000;
+      animation:retry-glow 2s infinite alternate;
+    }
+    @keyframes retry-glow{from{box-shadow:5px 5px 0 #000,0 0 10px #aa00ff44}to{box-shadow:5px 5px 0 #000,0 0 28px #aa00ffaa}}
+    .retry-btn:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 #000,0 0 30px #aa00ffcc;}
+    .retry-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000;}
+    .share-btn{
+      background:linear-gradient(135deg,#ff1493,#ff6b00,#ffd700);
+      border:4px solid #000; color:#000; box-shadow:5px 5px 0 #000,0 0 18px #ff149355;
+      font-weight:900; text-shadow:1px 1px 0 rgba(255,255,255,.5);
+      animation:share-glow 1.8s infinite alternate;
+    }
+    @keyframes share-glow{from{box-shadow:5px 5px 0 #000,0 0 10px #ff149344}to{box-shadow:5px 5px 0 #000,0 0 28px #ff1493aa}}
+    .share-btn:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 #000;}
+    .share-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000;}
+    .share-btn.copied{background:linear-gradient(135deg,#4ade80,#22c55e);color:#000;animation:none;}
+    .copylink-btn{
+      flex:1; padding:1rem .7rem; border-radius:14px; cursor:pointer;
+      font-size:clamp(.88rem,3.4vw,1rem); font-weight:900; transition:all .15s;
+      text-align:center; white-space:nowrap;
+      background:linear-gradient(135deg,#0369a1,#0891b2,#22d3ee);
+      border:4px solid #000; color:#fff;
+      box-shadow:5px 5px 0 #000,0 0 14px #22d3ee55;
+      text-shadow:1px 1px 0 #000;
+    }
+    .copylink-btn:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 #000;}
+    .copylink-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000;}
+    .copylink-btn.copied{background:linear-gradient(135deg,#4ade80,#22c55e);color:#000;animation:none;text-shadow:none;}
+    .read-btn{
+      flex:1; background:linear-gradient(135deg,#cc0055,#ff1493,#ff6b00);
+      border:4px solid #000; color:#fff;
+      padding:1.1rem .7rem; border-radius:14px;
+      cursor:pointer; font-size:clamp(.9rem,3.5vw,1.05rem);
+      font-weight:900; transition:all .15s; box-shadow:5px 5px 0 #000,0 0 18px #ff149355;
+      text-shadow:1px 1px 0 #000; white-space:nowrap;
+    }
+    .read-btn:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 #000;}
+    .read-btn.reading{background:linear-gradient(135deg,#f472b6,#a855f7);animation:pulse .8s infinite alternate;}
+    .privacy-hint{
+      margin-top:1.4rem; font-size:clamp(.68rem,2.8vw,.8rem);
+      color:rgba(255,255,255,.7); line-height:1.55; max-width:34em;
+      margin-left:auto; margin-right:auto; text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="leopard-bg"></div>
+<div class="overlay"></div>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <h1>🔮 声占い</h1>
+  <p class="subtitle">あんたの声が、今日の運命バラすで</p>
+
+  <div class="mic-area">
+    <button class="mic-btn" id="micBtn" title="押して喋ってみ">🎤</button>
+    <div class="countdown" id="countdown"></div>
+    <p class="status-text" id="statusText">ボタン押して、なんか喋ってみ？</p>
+    <div class="waveform" id="waveform"></div>
+  </div>
+
+  <div id="analysis-panel">
+    <p class="analysis-title" id="analysisTitle">── 声紋、調べたるわ ──</p>
+    <div class="metric">
+      <span class="metric-label">霊的振動数</span>
+      <div class="metric-bar-bg"><div class="metric-bar-fill" id="m1"></div></div>
+      <span class="metric-val" id="mv1">調べてるで…</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">運命共鳴係数</span>
+      <div class="metric-bar-bg"><div class="metric-bar-fill" id="m2"></div></div>
+      <span class="metric-val" id="mv2">調べてるで…</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">カルマ周波数</span>
+      <div class="metric-bar-bg"><div class="metric-bar-fill" id="m3"></div></div>
+      <span class="metric-val" id="mv3">調べてるで…</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">宇宙波動一致率</span>
+      <div class="metric-bar-bg"><div class="metric-bar-fill" id="m4"></div></div>
+      <span class="metric-val" id="mv4">調べてるで…</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">前世との同期率</span>
+      <div class="metric-bar-bg"><div class="metric-bar-fill" id="m5"></div></div>
+      <span class="metric-val" id="mv5">調べてるで…</span>
+    </div>
+  </div>
+
+  <div id="confirm-area">
+    <button class="confirm-btn" id="confirmBtn">この運命、受け取るか？🔮</button>
+    <p class="confirm-hint">※ 一回見たら後戻りできへんで</p>
+  </div>
+
+  <div id="fortune-card">
+    <p class="fortune-header">✦ 今日のあんたの運命や ✦</p>
+
+    <!-- 1. 煽り -->
+    <div class="odan-text" id="odanText"></div>
+
+    <!-- 2. レアリティ -->
+    <div class="rarity-wrap" id="rarityWrap">
+      <span class="rarity-badge" id="rarityBadge"></span>
+      <span class="rarity-comment" id="rarityComment"></span>
+    </div>
+
+    <!-- 3. SFX -->
+    <div class="sfx-wrap" id="sfxWrap" style="display:none">
+      <div class="sfx-display" id="sfxDisplay"></div>
+    </div>
+
+    <!-- 4. 超デカ鑑定結果 -->
+    <p class="fortune-title" id="fortuneTitle"></p>
+
+    <!-- 5. 関西弁フレーズ -->
+    <div class="kansai-phrase" id="kansaiPhrase" style="display:none"></div>
+
+    <!-- 6. ツッコミ -->
+    <div class="tsukkomi-wrap" id="tsukkomiWrap" style="display:none">
+      <div class="tsukkomi" id="tsukkomiText"></div>
+    </div>
+
+    <!-- 7. 声の鑑定書 -->
+    <div class="voice-comment" id="voiceComment"></div>
+
+    <!-- 8. 詳細説明 -->
+    <span class="fortune-body-label">【おばちゃんの詳細解説】</span>
+    <p class="fortune-body" id="fortuneBody"></p>
+
+    <!-- 9. ラッキー情報 -->
+    <div class="lucky-header">🍀 今日のラッキー情報 🍀</div>
+    <div class="fortune-lucky" id="fortuneLucky"></div>
+
+    <!-- 10. ポジティブ -->
+    <div class="positive-msg" id="positiveMsg"></div>
+
+    <!-- 外れ -->
+    <button class="miss-btn" id="missBtn">😢 外れてるんやけど…</button>
+    <div class="miss-response" id="missResponse"></div>
+    <button class="miss-again-btn" id="missAgainBtn">もっと慰めてくれへん？</button>
+
+    <!-- ボタン群 -->
+    <div class="btn-row">
+      <button class="retry-btn" id="retryBtn">🔄 もっかい占う</button>
+      <button class="share-btn" id="shareBtn">🖼 画像で保存</button>
+    </div>
+    <div class="btn-row" style="margin-top:.6rem">
+      <button class="copylink-btn" id="copyLinkBtn" type="button">🔗 このページのURLをコピー</button>
+    </div>
+    <div class="btn-row" style="margin-top:.6rem">
+      <button class="read-btn" id="readBtn">🔊 おばちゃんが読み上げる</button>
+    </div>
+  </div>
+
+  <p class="privacy-hint" role="note">録音した音声はこの端末の中だけで処理されます。サーバーへ送信はしません。</p>
+</div>
+
+<script src="fortunes.js"></script>
+<script>
+  // ── 効果音 ──
+  let sfxCtx = null;
+  function getSfx() {
+    if (!sfxCtx) sfxCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return sfxCtx;
+  }
+  function tone(freq, dur, type = 'sine', vol = 0.22, delay = 0) {
+    try {
+      const c = getSfx();
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, c.currentTime + delay);
+      g.gain.setValueAtTime(0, c.currentTime + delay);
+      g.gain.linearRampToValueAtTime(vol, c.currentTime + delay + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + dur);
+      o.connect(g); g.connect(c.destination);
+      o.start(c.currentTime + delay);
+      o.stop(c.currentTime + delay + dur + 0.05);
+    } catch(e) {}
+  }
+  function playPip() {
+    tone(660, 0.07, 'sine', 0.18);
+    tone(990, 0.1,  'sine', 0.18, 0.09);
+  }
+  function playDrumRoll() {
+    for (let i = 0; i < 20; i++) {
+      tone(55 + i * 4, 0.09, 'sawtooth', 0.05 + i * 0.004, i * 0.11);
+    }
+  }
+  function playErrorSound() {
+    tone(320, 0.12, 'square', 0.18, 0);
+    tone(270, 0.12, 'square', 0.18, 0.15);
+    tone(220, 0.35, 'square', 0.14, 0.30);
+  }
+  function playFanfare(rid) {
+    if (rid === 'noroware') {
+      [220, 208, 196, 185, 165].forEach((f, i) => tone(f, 0.45, 'triangle', 0.18, i * 0.18));
+    } else if (rid === 'gekirare') {
+      [330, 415, 523, 659, 784, 1047].forEach((f, i) => tone(f, 0.22, 'sine', 0.2, i * 0.08));
+      [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.35, 'sine', 0.22, 0.55 + i * 0.1));
+      tone(1047, 0.7, 'sine', 0.25, 1.0);
+    } else if (rid === 'suurare') {
+      [392, 494, 587, 740, 880].forEach((f, i) => tone(f, 0.28, 'sine', 0.2, i * 0.09));
+      tone(880, 0.5, 'sine', 0.2, 0.48);
+    } else if (rid === 'rare') {
+      [440, 554, 659, 784].forEach((f, i) => tone(f, 0.22, 'sine', 0.17, i * 0.09));
+    } else {
+      [523, 659].forEach((f, i) => tone(f, 0.2, 'sine', 0.14, i * 0.1));
+    }
+  }
+
+  // ── レアリティ ──
+  const rarities = [
+    { id: 'futsuu',   label: '⬛ 超普通',  weight: 30,
+      comment: 'まあ、よくある感じの運命やな。特に何もない。これはこれでええ。' },
+    { id: 'mamaa',    label: '🟩 まあまあ', weight: 25,
+      comment: 'なんかあるかも、ぐらいの運命やで。期待しすぎんといてや。' },
+    { id: 'rare',     label: '🔵 レア',    weight: 20,
+      comment: 'ちょっとレアやで。周りより少しだけ面白い一日になるかもしれん。' },
+    { id: 'suurare',  label: '🟣 超レア',  weight: 15,
+      comment: '超レアやで！！今日のあんた、かなりついとる！大事に使ってや！' },
+    { id: 'gekirare', label: '🌟 激レア',  weight: 8,
+      comment: '激レアやん！！！宇宙始まって以来の珍事や！！落ち着いて！！いや落ち着かんでええ！！' },
+    { id: 'noroware', label: '💀 呪われ',  weight: 2,
+      comment: 'ごめんて。これだけはどうにもならんかった。占いも逃げたかった。あんたのせいやない。' },
+  ];
+  function pickRarity() {
+    const total = rarities.reduce((s, r) => s + r.weight, 0);
+    let rand = Math.random() * total;
+    for (const r of rarities) { if ((rand -= r.weight) <= 0) return r; }
+    return rarities[0];
+  }
+  let currentRarity = null;
+
+  const rarityHex = { futsuu:'#9ca3af', mamaa:'#4ade80', rare:'#38bdf8', suurare:'#a78bfa', gekirare:'#fbbf24', noroware:'#ef4444' };
+  const sfxLabel  = { futsuu:'…まあな', mamaa:'ほほう！', rare:'おっ！！', suurare:'すごい！！', gekirare:'ズバーン！！！', noroware:'ゾクッ…' };
+  const charExpr  = { futsuu:'normal', mamaa:'smile', rare:'happy', suurare:'star', gekirare:'shocked', noroware:'cursed' };
+
+  // ── canvas描画ヘルパー ──
+  function wrapText(ctx, text, x, y, maxW, lh) {
+    for (const para of text.split('\n')) {
+      if (!para) { y += lh * 0.4; continue; }
+      let line = '';
+      for (const ch of para) {
+        const t = line + ch;
+        if (ctx.measureText(t).width > maxW && line) { ctx.fillText(line,x,y); y+=lh; line=ch; }
+        else line = t;
+      }
+      if (line) { ctx.fillText(line,x,y); y+=lh; }
+      y += lh * 0.2;
+    }
+    return y;
+  }
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  }
+  function otxt(ctx, text, x, y, sw, sc, fc, align='center') {
+    ctx.textAlign = align;
+    if (sw > 0) { ctx.lineWidth=sw; ctx.strokeStyle=sc; ctx.strokeText(text,x,y); }
+    ctx.fillStyle = fc; ctx.fillText(text,x,y);
+  }
+  function speedLines(ctx, cx, cy, n, minR, maxR, alpha) {
+    ctx.save();
+    for (let i=0;i<n;i++) {
+      const a=(i/n)*Math.PI*2, r1=minR+Math.random()*20, r2=maxR+Math.random()*100;
+      ctx.strokeStyle=`rgba(0,0,0,${alpha*(0.4+Math.random()*0.8)})`;
+      ctx.lineWidth=0.5+Math.random()*2.5;
+      ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
+      ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawBurst(ctx, cx, cy, pts, ro, ri, fill, stroke, lw) {
+    ctx.beginPath();
+    for (let i=0;i<pts*2;i++) {
+      const a=(i/(pts*2))*Math.PI*2-Math.PI/2, r=i%2===0?ro:ri;
+      i===0?ctx.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r):ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);
+    }
+    ctx.closePath();
+    ctx.fillStyle=fill; ctx.fill(); ctx.strokeStyle=stroke; ctx.lineWidth=lw; ctx.stroke();
+  }
+
+  // キャラクター描画（大阪のおばちゃん）
+  function drawChar(ctx, cx, cy, sz, expr, rc) {
+    // ── 胴体（ふっくら）──
+    ctx.fillStyle='#ffe0f0'; ctx.strokeStyle='#111'; ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(cx-sz*.45,cy+sz*.12);
+    ctx.bezierCurveTo(cx-sz*.5,cy+sz*.5,cx-sz*.4,cy+sz*1.1,cx-sz*.32,cy+sz*1.15);
+    ctx.lineTo(cx+sz*.32,cy+sz*1.15);
+    ctx.bezierCurveTo(cx+sz*.4,cy+sz*1.1,cx+sz*.5,cy+sz*.5,cx+sz*.45,cy+sz*.12);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    // ヒョウ柄ドット（服）
+    ctx.fillStyle=rc+'66';
+    [[-.2,.4],[.1,.38],[-.05,.65],[.22,.6],[-.24,.72],[.04,.85]].forEach(([ox,oy])=>{
+      ctx.beginPath(); ctx.ellipse(cx+sz*ox,cy+sz*oy,sz*.07,sz*.05,Math.random()*.5,0,Math.PI*2); ctx.fill();
+    });
+    // 首
+    ctx.fillStyle='#f5c8a0'; ctx.strokeStyle='#111'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.rect(cx-sz*.1,cy-sz*.05,sz*.2,sz*.2); ctx.fill(); ctx.stroke();
+
+    // ── 顔（丸くふっくら）──
+    ctx.save(); ctx.scale(1,1.08);
+    ctx.beginPath(); ctx.arc(cx,(cy-sz*.48)/1.08,sz*.52,0,Math.PI*2);
+    ctx.fillStyle='#f5c8a0'; ctx.fill(); ctx.strokeStyle='#111'; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.restore();
+
+    // ── パーマ髪（ふわふわ・グレー混じり）──
+    const hairC='#7a6a6a';
+    ctx.fillStyle=hairC;
+    // 全体のもっさりパーマ
+    const hairPts=[
+      [-.52,-.5,.26],[-.38,-.88,.22],[-.18,-1.0,.2],[.06,-1.02,.21],
+      [.28,-.92,.22],[.5,-.72,.24],[.56,-.45,.22],[-.56,-.32,.18],
+      [-.48,-.1,.16],[.48,-.08,.16],
+    ];
+    hairPts.forEach(([ox,oy,r])=>{
+      ctx.beginPath(); ctx.arc(cx+sz*ox,cy+sz*oy,sz*r,0,Math.PI*2); ctx.fill();
+    });
+    // 髪の輪郭線
+    ctx.strokeStyle='#5a4a4a'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(cx,cy-sz*.48,sz*.54,Math.PI*.78,Math.PI*2.22); ctx.stroke();
+
+    // ── 眉（やや太め・親しみやすい）──
+    ctx.strokeStyle='#5a4040'; ctx.lineWidth=3.5; ctx.lineCap='round';
+    [-.22,.22].forEach(ox=>{
+      ctx.beginPath(); ctx.arc(cx+sz*ox,cy-sz*.62,sz*.16,Math.PI*1.1,Math.PI*1.9); ctx.stroke();
+    });
+
+    // ── 目 ──
+    if(expr==='shocked'){
+      [-.22,.22].forEach(ox=>{
+        ctx.beginPath(); ctx.arc(cx+sz*ox,cy-sz*.48,sz*.13,0,Math.PI*2);
+        ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='#111'; ctx.lineWidth=2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx+sz*ox+sz*.03,cy-sz*.48,sz*.08,0,Math.PI*2);
+        ctx.fillStyle='#2a1a0a'; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+sz*ox+sz*.05,cy-sz*.5,sz*.03,0,Math.PI*2);
+        ctx.fillStyle='#fff'; ctx.fill();
+      });
+    } else if(expr==='cursed'){
+      [-.22,.22].forEach(ox=>{
+        const ex=cx+sz*ox, ey=cy-sz*.48, d=sz*.1;
+        ctx.strokeStyle='#5a3030'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.moveTo(ex-d,ey-d); ctx.lineTo(ex+d,ey+d); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ex+d,ey-d); ctx.lineTo(ex-d,ey+d); ctx.stroke();
+        ctx.strokeStyle='#ef444455'; ctx.lineWidth=1.5;
+        for(let k=0;k<4;k++){const ka=k*Math.PI/2;ctx.beginPath();ctx.moveTo(ex+Math.cos(ka)*sz*.14,ey+Math.sin(ka)*sz*.14);ctx.lineTo(ex+Math.cos(ka)*sz*.2,ey+Math.sin(ka)*sz*.2);ctx.stroke();}
+      });
+    } else {
+      // 普通・嬉しい・驚き系は黒目でやさしい目
+      [-.22,.22].forEach(ox=>{
+        ctx.beginPath(); ctx.arc(cx+sz*ox,cy-sz*.48,sz*.12,0,Math.PI*2);
+        ctx.fillStyle='#2a1a0a'; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+sz*ox+sz*.04,cy-sz*.5,sz*.04,0,Math.PI*2);
+        ctx.fillStyle='#fff'; ctx.fill();
+        // まつげ
+        if(expr==='happy'||expr==='star'){
+          [[-.1,-.12],[0,-.13],[.1,-.11]].forEach(([lox,loy])=>{
+            ctx.strokeStyle='#2a1a0a'; ctx.lineWidth=1.5;
+            ctx.beginPath(); ctx.moveTo(cx+sz*ox+sz*lox*1.0,cy-sz*.48+sz*loy*.5);
+            ctx.lineTo(cx+sz*ox+sz*lox*1.6,cy-sz*.48+sz*loy*1.3); ctx.stroke();
+          });
+        }
+      });
+      if(expr==='star'){
+        [-.22,.22].forEach(ox=>{
+          for(let k=0;k<5;k++){const sa=k*Math.PI*.4-Math.PI*.5;
+            ctx.beginPath(); ctx.moveTo(cx+sz*ox,cy-sz*.48);
+            ctx.lineTo(cx+sz*ox+Math.cos(sa)*sz*.16,cy-sz*.48+Math.sin(sa)*sz*.16);
+            ctx.strokeStyle='#fbbf24'; ctx.lineWidth=1.5; ctx.stroke();
+          }
+        });
+      }
+    }
+
+    // ── ほっぺ（赤み）──
+    ctx.save(); ctx.globalAlpha=0.3;
+    ctx.fillStyle='#ff4466';
+    ctx.beginPath(); ctx.ellipse(cx-sz*.31,cy-sz*.38,sz*.14,sz*.09,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx+sz*.31,cy-sz*.38,sz*.14,sz*.09,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // ── 鼻 ──
+    ctx.fillStyle='#e8a882';
+    ctx.beginPath(); ctx.ellipse(cx,cy-sz*.38,sz*.05,sz*.04,0,0,Math.PI*2); ctx.fill();
+
+    // ── 口 ──
+    ctx.strokeStyle='#5a3030'; ctx.lineWidth=2.5; ctx.lineCap='round';
+    if(expr==='shocked'){
+      ctx.beginPath(); ctx.arc(cx,cy-sz*.25,sz*.1,0,Math.PI*2); ctx.stroke();
+    } else if(expr==='cursed'){
+      ctx.beginPath(); ctx.moveTo(cx-sz*.18,cy-sz*.26);
+      ctx.bezierCurveTo(cx-sz*.06,cy-sz*.33,cx+sz*.06,cy-sz*.33,cx+sz*.18,cy-sz*.26); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(cx,cy-sz*.24,sz*.2,Math.PI*.1,Math.PI*.9); ctx.stroke();
+      if(expr==='happy'||expr==='star'){
+        ctx.save(); ctx.globalAlpha=0.85;
+        ctx.fillStyle='#fff8f0'; ctx.strokeStyle='#e0d0c8'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.arc(cx,cy-sz*.24,sz*.17,Math.PI*.12,Math.PI*.88);
+        ctx.lineTo(cx-sz*.17,cy-sz*.24); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // ── イヤリング（ビーズ風）──
+    [-.52,.52].forEach(ox=>{
+      ctx.fillStyle=rc; ctx.strokeStyle='#111'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(cx+sz*ox,cy-sz*.44,sz*.08,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // 輝き
+      ctx.fillStyle='rgba(255,255,255,.6)';
+      ctx.beginPath(); ctx.arc(cx+sz*ox-sz*.03,cy-sz*.47,sz*.03,0,Math.PI*2); ctx.fill();
+    });
+
+    // ── 水晶玉 ──
+    const bally=cy+sz*.8;
+    const ballGrad=ctx.createRadialGradient(cx-sz*.1,bally-sz*.12,sz*.02,cx,bally,sz*.32);
+    ballGrad.addColorStop(0,'#fff'); ballGrad.addColorStop(0.35,rc+'88'); ballGrad.addColorStop(1,rc+'cc');
+    ctx.beginPath(); ctx.arc(cx,bally,sz*.32,0,Math.PI*2);
+    ctx.fillStyle=ballGrad; ctx.fill(); ctx.strokeStyle='#111'; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.75)';
+    ctx.beginPath(); ctx.arc(cx-sz*.1,bally-sz*.12,sz*.1,0,Math.PI*2); ctx.fill();
+    // 台座
+    ctx.fillStyle='#7a5a10'; ctx.strokeStyle='#111'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cx-sz*.26,bally+sz*.32); ctx.lineTo(cx+sz*.26,bally+sz*.32);
+    ctx.lineTo(cx+sz*.34,bally+sz*.46); ctx.lineTo(cx-sz*.34,bally+sz*.46);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+
+  // ── ラッキーアイテム絵文字マップ ──
+  function getLuckyEmoji(label, value) {
+    const kw = (label+value);
+    if(/魚|サバ|鮭|タラ|サンマ/.test(kw)) return '🐟';
+    if(/タコス|ラーメン|カレー|フード|食べ|料理|おにぎり|トッピング/.test(kw)) return '🍜';
+    if(/時刻|時間|時/.test(kw)) return '⏰';
+    if(/ナンバー|数字|数/.test(kw)) return '🔢';
+    if(/言葉|ワード|呪文/.test(kw)) return '💬';
+    if(/行動|アクション/.test(kw)) return '⚡';
+    if(/色|カラー/.test(kw)) return '🎨';
+    if(/傘/.test(kw)) return '☂️';
+    if(/椅子|家具/.test(kw)) return '🪑';
+    if(/ドリンク|コーヒー|飲み物/.test(kw)) return '☕';
+    if(/前世|霊|守護/.test(kw)) return '👻';
+    if(/鳥|ハト|バード/.test(kw)) return '🐦';
+    if(/猫|ねこ/.test(kw)) return '🐱';
+    if(/スマホ|充電|Wi-Fi/.test(kw)) return '📱';
+    if(/お金|金運|ATM|残高/.test(kw)) return '💰';
+    if(/音楽|BGM|曲|歌/.test(kw)) return '🎵';
+    if(/靴下|靴|足/.test(kw)) return '🧦';
+    if(/花|植物/.test(kw)) return '🌸';
+    if(/メモ|書く|紙|ペン/.test(kw)) return '📝';
+    if(/アイテム/.test(kw)) return '✨';
+    if(/方位|場所/.test(kw)) return '🧭';
+    if(/スーパー|コンビニ|ドラッグ/.test(kw)) return '🏪';
+    if(/きのこ|キノコ/.test(kw)) return '🍄';
+    if(/星|宇宙|惑星/.test(kw)) return '⭐';
+    return '🎯';
+  }
+
+  // ── メネタ画像生成（ネタ画像特化） ──
+  function downloadFortuneImage() {
+    if (!selectedFortune || !currentRarity) return;
+    const W = 600;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = 2400;
+    const ctx = canvas.getContext('2d');
+    const rc = rarityHex[currentRarity.id] || '#a78bfa';
+    const expr = charExpr[currentRarity.id] || 'normal';
+    const osakaGold = '#ffd700';
+    const osakaHot  = '#ff1493';
+    const accent    = currentRarity.id==='noroware' ? '#ff4444' : currentRarity.id==='gekirare' ? osakaGold : '#ff6b35';
+    let y = 0;
+
+    // ── キャンバス全体にビビッドピンク×黒ヒョウ柄背景 ──
+    const totalH = 2400;
+    // ベース（マダムシンコ風ビビッドピンク）
+    ctx.fillStyle='#f0006a'; ctx.fillRect(0,0,W,totalH);
+    // 黒ヒョウ柄スポット（大きめ・クッキリ）
+    const spotData=[
+      [45,38,54,36],[120,16,36,54],[175,88,48,32],[70,125,32,48],
+      [155,162,42,26],[14,175,26,42],[200,40,24,36],[95,210,38,24],
+    ];
+    const tileW=225, tileH=225;
+    for(let tx=0;tx<W;tx+=tileW) for(let ty=0;ty<totalH;ty+=tileH){
+      spotData.forEach(([sx,sy,ew,eh])=>{
+        ctx.fillStyle='rgba(0,0,0,0.92)';
+        ctx.beginPath();
+        ctx.ellipse(tx+sx,ty+sy,ew/2,eh/2,0,0,Math.PI*2);
+        ctx.fill();
+      });
+    }
+    // 軽いオーバーレイ（可読性確保・最小限）
+    ctx.fillStyle='rgba(0,0,0,0.28)'; ctx.fillRect(0,0,W,totalH);
+
+    // ══ HEADER ══
+    const hH = 110;
+    const hg = ctx.createLinearGradient(0,0,W,hH);
+    hg.addColorStop(0,'#000'); hg.addColorStop(0.4,'#cc0055cc'); hg.addColorStop(1,'#000');
+    ctx.fillStyle=hg; ctx.fillRect(0,0,W,hH);
+    // ヒョウ柄風斜め線
+    ctx.strokeStyle='rgba(255,20,147,0.35)'; ctx.lineWidth=1.5;
+    for(let i=0;i<W;i+=18){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i-22,hH);ctx.stroke();}
+    ctx.font='bold 30px sans-serif';
+    otxt(ctx,'🔮 声占い ─ 大阪おばちゃん鑑定所',W/2,50,5,'#000','#fff');
+    ctx.font='bold 20px sans-serif';
+    otxt(ctx,'★ '+new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'})+' 発行 ★',W/2,84,2,'#000','#ff69b4');
+    y = hH;
+
+    // ══ 煽りパネル ══
+    const p1H = 150;
+    ctx.fillStyle='rgba(0,0,0,0.75)'; ctx.fillRect(0,y,W,p1H);
+    // 白スピードライン
+    ctx.save();
+    for(let k=0;k<40;k++){
+      const a=k*(Math.PI/20);
+      ctx.strokeStyle=`rgba(255,255,255,${0.02+Math.random()*0.05})`;
+      ctx.lineWidth=0.5+Math.random()*2;
+      ctx.beginPath();ctx.moveTo(W/2+Math.cos(a)*5,y+p1H/2+Math.sin(a)*4);
+      ctx.lineTo(W/2+Math.cos(a)*400,y+p1H/2+Math.sin(a)*70);ctx.stroke();
+    }
+    ctx.restore();
+    // 星キラキラ
+    [[50,y+20],[W-50,y+20],[30,y+p1H-20],[W-30,y+p1H-20],[W/2,y+14]].forEach(([sx,sy])=>{
+      ctx.font='18px sans-serif'; ctx.textAlign='center'; ctx.fillStyle=osakaGold; ctx.fillText('★',sx,sy);
+    });
+    const odanTxt = document.getElementById('odanText').textContent || 'ズバリ言うで！！！';
+    const odLen = odanTxt.replace(/[^\u0000-\u007F]/g,'XX').length;
+    const odSz = odLen > 16 ? 36 : odLen > 10 ? 46 : 58;
+    ctx.save(); ctx.translate(W/2, y+p1H/2+odSz/3); ctx.rotate(-0.06);
+    ctx.font=`bold ${odSz}px sans-serif`; ctx.textAlign='center';
+    ctx.lineWidth=14; ctx.strokeStyle='#000'; ctx.strokeText(odanTxt,0,0);
+    ctx.lineWidth=7;  ctx.strokeStyle=osakaHot; ctx.strokeText(odanTxt,0,0);
+    ctx.fillStyle=osakaGold; ctx.fillText(odanTxt,0,0);
+    ctx.restore();
+    ctx.strokeStyle='#111'; ctx.lineWidth=5; ctx.strokeRect(0,y,W,p1H);
+    y += p1H;
+
+    // ══ キャラ＋レアリティパネル ══
+    const p2H = 400;
+    // 薄ピンク無地（ヒョウ柄が透けないよう完全塗りつぶし）
+    ctx.fillStyle = '#FFE8F2';
+    ctx.fillRect(0,y,W,p2H);
+    speedLines(ctx,W*.25,y+p2H*.44,120,20,340,0.11);
+    drawChar(ctx,W*.23,y+p2H*.46,130,expr,rc);
+    // 吹き出し
+    const bubX=W*.38,bubY=y+20,bubW=W*.58,bubH=230;
+    ctx.fillStyle='rgba(0,0,0,.16)'; roundRect(ctx,bubX+4,bubY+4,bubW,bubH,14); ctx.fill();
+    const bg2=ctx.createLinearGradient(bubX,bubY,bubX+bubW,bubY+bubH);
+    bg2.addColorStop(0,'#fff'); bg2.addColorStop(1,'#fff');
+    ctx.fillStyle=bg2; ctx.strokeStyle='#111'; ctx.lineWidth=3.5;
+    roundRect(ctx,bubX,bubY,bubW,bubH,14); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#fff'; ctx.strokeStyle='#111'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(bubX+8,bubY+90); ctx.lineTo(bubX-24,bubY+110); ctx.lineTo(bubX+8,bubY+125); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=rc; roundRect(ctx,bubX,bubY,bubW,28,14);
+    ctx.fillRect(bubX,bubY+14,bubW,14); ctx.fill();
+    ctx.font='bold 12px sans-serif'; otxt(ctx,'おばちゃんの鑑定結果や！',bubX+bubW/2,bubY+19,0,'','#fff');
+    ctx.fillStyle='#111'; ctx.font='bold 26px sans-serif'; ctx.textAlign='left';
+    wrapText(ctx,currentRarity.comment,bubX+14,bubY+62,bubW-28,38);
+    ctx.font='11px sans-serif'; ctx.fillStyle=rc+'cc'; ctx.textAlign='right';
+    ctx.fillText('─ 大阪おばちゃん占い師 ─',bubX+bubW-8,bubY+bubH-8);
+    // レアリティバースト（吹き出しの下に配置）
+    const bx=W*.74, bby=y+p2H-90;
+    drawBurst(ctx,bx,bby,18,95,55,rc,'#111',4.5);
+    drawBurst(ctx,bx,bby,12,58,36,osakaGold,rc,2.5);
+    drawBurst(ctx,bx,bby,8,30,18,'#fff',osakaGold,1.5);
+    ctx.font=`bold ${currentRarity.label.length>6?14:18}px sans-serif`;
+    otxt(ctx,currentRarity.label,bx,bby+6,4,'#000','#fff');
+    ctx.strokeStyle='#111'; ctx.lineWidth=5.5; ctx.strokeRect(0,y,W,p2H);
+    y += p2H;
+
+    // ══ 超デカ鑑定結果パネル ══
+    const p3H = 220;
+    ctx.fillStyle='#000'; ctx.fillRect(0,y,W,p3H);
+    ctx.save();
+    for(let k=0;k<42;k++){
+      const a=k*(Math.PI/21), al=0.02+Math.random()*.06;
+      ctx.strokeStyle=`rgba(255,255,255,${al})`; ctx.lineWidth=0.8+Math.random()*2.5;
+      ctx.beginPath(); ctx.moveTo(W/2,y+p3H/2);
+      ctx.lineTo(W/2+Math.cos(a)*400,y+p3H/2+Math.sin(a)*90); ctx.stroke();
+    }
+    ctx.restore();
+    ctx.save(); ctx.globalAlpha=0.15;
+    for(let k=0;k<14;k++){const a=k*Math.PI/7;ctx.strokeStyle=rc;ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(W/2,y+p3H/2);ctx.lineTo(W/2+Math.cos(a)*380,y+p3H/2+Math.sin(a)*80);ctx.stroke();}
+    ctx.restore();
+    ctx.font='bold 10px sans-serif'; otxt(ctx,'▼ 今日のあんたの運命 ▼',W/2,y+18,0,'','#555');
+    const rawTitle = selectedFortune.title;
+    const titleLen = rawTitle.replace(/[\u{1F000}-\u{1FAFF}]/gu,'').replace(/[^\u0000-\u007F]/g,'X').length;
+    let titleSz = titleLen>14?40:titleLen>10?52:titleLen>7?62:72;
+    ctx.font=`bold ${titleSz}px sans-serif`;
+    while(ctx.measureText(rawTitle).width > W-32 && titleSz > 18){
+      titleSz -= 2; ctx.font=`bold ${titleSz}px sans-serif`;
+    }
+    const titleY = y + p3H/2 + titleSz*0.36;
+    ctx.textAlign='center';
+    ctx.lineWidth=16; ctx.strokeStyle='#000'; ctx.strokeText(rawTitle,W/2,titleY);
+    ctx.lineWidth=8;  ctx.strokeStyle='#ff69b4'; ctx.strokeText(rawTitle,W/2,titleY);
+    ctx.fillStyle=osakaHot; ctx.fillText(rawTitle,W/2,titleY);
+    ctx.strokeStyle='#111'; ctx.lineWidth=5.5; ctx.strokeRect(0,y,W,p3H);
+    y += p3H;
+
+    // ══ ツッコミパネル ══
+    const p4H = 110;
+    const p4g = ctx.createLinearGradient(0,y,W,y+p4H);
+    p4g.addColorStop(0,osakaGold); p4g.addColorStop(0.5,'#ffe566'); p4g.addColorStop(1,osakaGold);
+    ctx.fillStyle=p4g; ctx.fillRect(0,y,W,p4H);
+    ctx.fillStyle='rgba(0,0,0,0.07)';
+    for(let dx=8;dx<W;dx+=12){ctx.beginPath();ctx.arc(dx,y+p4H/2,2.5,0,Math.PI*2);ctx.fill();}
+    const tsukkomiTxt = document.getElementById('tsukkomiText').textContent || 'ほんまかいな！！';
+    ctx.font=`bold ${tsukkomiTxt.length>14?26:tsukkomiTxt.length>10?32:38}px sans-serif`;
+    ctx.fillStyle='#1a0a00'; ctx.textAlign='center';
+    ctx.fillText('💬 ' + tsukkomiTxt, W/2, y+p4H/2+12);
+    ctx.strokeStyle='#111'; ctx.lineWidth=4.5; ctx.strokeRect(0,y,W,p4H);
+    y += p4H;
+
+    // ══════════════════════════════════════════
+    // おばちゃんの鑑定書パネル【ダウンロード画像専用】
+    // 通常画面は CSS(.voice-comment) で完全分離。DOM・CSS 変更なし。
+    // ══════════════════════════════════════════
+    {
+      // ── テキスト取得（段落配列） ──────────────────────────
+      const vcEl  = document.getElementById('voiceComment');
+      const vcRaw = vcEl ? vcEl.textContent.trim() : '';
+      const vcParas = vcRaw.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 8);
+      if (!vcParas.length) vcParas.push('鑑定結果が見当たらへんかったで。もっかい試してみ。');
+
+      // ── レイアウト定数（保存画像専用） ────────────────────
+      const _FS1 = 27;   // 第1段落 フォントサイズ
+      const _LH1 = 48;   // 第1段落 行間
+      const _FS2 = 23;   // 2段落以降 フォントサイズ
+      const _LH2 = 44;   // 2段落以降 行間
+      const _MX  = 68;   // 左右マージン
+      const _HH  = 96;   // ヘッダー高さ
+      const _MT  = 32;   // ヘッダー下〜本文 余白
+      const _PGP = 20;   // 段落間スペース
+      const _CR  = 16;   // 角丸半径
+      const _PAD = 6;    // パネル外周マージン（影用）
+
+      // ── 高さ測定 ────────────────────────────────────────
+      const _mc = document.createElement('canvas');
+      _mc.width = W; _mc.height = 3000;
+      const _mx = _mc.getContext('2d');
+      let _measY = 0;
+      vcParas.forEach((para, i) => {
+        const lh = i === 0 ? _LH1 : _LH2;
+        _mx.font = i === 0 ? `bold ${_FS1}px serif` : `${_FS2}px serif`;
+        _measY = wrapText(_mx, para, 0, _measY, W - _MX*2, lh);
+        _measY += _PGP;
+      });
+      const _pH = Math.max(_measY + _HH + _MT + 100, 460);
+
+      // ════════════════════════════════════════
+      // STEP A : ドロップシャドウ
+      // ════════════════════════════════════════
+      ctx.save();
+      ctx.shadowColor   = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur    = 28;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = '#E8DEC0';
+      roundRect(ctx, _PAD, y+_PAD, W-_PAD*2, _pH-_PAD*2, _CR);
+      ctx.fill();
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+
+      // ════════════════════════════════════════
+      // STEP B : 角丸クリップ内を描画
+      // ════════════════════════════════════════
+      ctx.save();
+      roundRect(ctx, _PAD, y+_PAD, W-_PAD*2, _pH-_PAD*2, _CR);
+      ctx.clip();
+
+      // ── B-1. 薄ピンク無地ベース（柄・模様なし） ─────────────
+      // 見てすぐ「ピンク」と分かる淡さ。文字は十分読める。
+      ctx.fillStyle = '#FFE8F2';
+      ctx.fillRect(0, y, W, _pH);
+      // ※ 柄・テクスチャは一切入れない
+
+      // ── B-3. ヘッダーバー（格調こげ茶） ─────────────────
+      const _hg = ctx.createLinearGradient(0, y, W, y+_HH);
+      _hg.addColorStop(0,    '#0e0500');
+      _hg.addColorStop(0.2,  '#321202');
+      _hg.addColorStop(0.5,  '#4a1c06');
+      _hg.addColorStop(0.8,  '#321202');
+      _hg.addColorStop(1,    '#0e0500');
+      ctx.fillStyle = _hg;
+      ctx.fillRect(0, y, W, _HH);
+
+      // ヘッダー上下ゴールド飾り線
+      ctx.strokeStyle = 'rgba(200,155,40, 1.0)'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(10, y+5);      ctx.lineTo(W-10, y+5);      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(10, y+_HH-6);  ctx.lineTo(W-10, y+_HH-6);  ctx.stroke();
+      ctx.strokeStyle = 'rgba(200,155,40, 0.35)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(18, y+11);     ctx.lineTo(W-18, y+11);     ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(18, y+_HH-12); ctx.lineTo(W-18, y+_HH-12); ctx.stroke();
+
+      // ヘッダー左右 ◈
+      ctx.font = '16px sans-serif'; ctx.fillStyle = 'rgba(205,160,48, 0.72)';
+      ctx.textAlign = 'left';  ctx.fillText('◈', 20, y+_HH/2+8);
+      ctx.textAlign = 'right'; ctx.fillText('◈', W-20, y+_HH/2+8);
+
+      // ヘッダー メインタイトル（34px・ゴールド）
+      ctx.textAlign  = 'center';
+      ctx.font       = 'bold 34px sans-serif';
+      ctx.lineWidth  = 7;
+      ctx.strokeStyle = 'rgba(0,0,0,0.92)';
+      ctx.strokeText('おばちゃんの鑑定書', W/2, y+_HH/2+10);
+      ctx.fillStyle  = '#F4CF52';
+      ctx.fillText  ('おばちゃんの鑑定書', W/2, y+_HH/2+10);
+
+      // ヘッダー サブライン
+      ctx.font      = '13px sans-serif';
+      ctx.fillStyle = 'rgba(215,178,70, 0.60)';
+      ctx.fillText('── 本日の霊的鑑定結果 ──', W/2, y+_HH-10);
+
+      // ── B-4. ヘッダー下ゴールドライン ────────────────────
+      ctx.strokeStyle = 'rgba(195,150,38, 0.80)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(0, y+_HH+1); ctx.lineTo(W, y+_HH+1); ctx.stroke();
+      ctx.strokeStyle = 'rgba(195,150,38, 0.25)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, y+_HH+5); ctx.lineTo(W, y+_HH+5); ctx.stroke();
+
+      // ── B-5. 内装飾枠（本文エリア） ──────────────────────
+      // 証書らしい「内側に二重線の飾り枠」
+      const _bfx = _MX - 26;
+      const _bfy = y + _HH + 16;
+      const _bfw = W - _bfx * 2;
+      const _bfh = _pH - _HH - 28;
+      ctx.strokeStyle = 'rgba(155,110,35, 0.38)'; ctx.lineWidth = 1.5;
+      roundRect(ctx, _bfx, _bfy, _bfw, _bfh, 8);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(155,110,35, 0.16)'; ctx.lineWidth = 1;
+      roundRect(ctx, _bfx+5, _bfy+5, _bfw-10, _bfh-10, 5);
+      ctx.stroke();
+
+      // 四隅の装飾（◆）
+      ctx.font = '14px sans-serif'; ctx.fillStyle = 'rgba(145,100,30,0.55)';
+      [[_bfx+2, _bfy+14],[_bfx+_bfw-2, _bfy+14],[_bfx+2, _bfy+_bfh-2],[_bfx+_bfw-2, _bfy+_bfh-2]]
+        .forEach(([cx2,cy2]) => { ctx.textAlign = cx2<W/2?'left':'right'; ctx.fillText('◆',cx2,cy2); });
+
+      // ── B-6. 本文テキスト ──────────────────────────────
+      ctx.textAlign = 'left';
+      let _bodyY = y + _HH + _MT + 16;
+
+      vcParas.forEach((para, i) => {
+        if (i === 0) {
+          ctx.font      = `bold ${_FS1}px serif`;
+          ctx.fillStyle = '#1a0800';
+          _bodyY = wrapText(ctx, para, _MX, _bodyY, W-_MX*2, _LH1);
+          _bodyY += _PGP + 4;
+        } else {
+          ctx.font      = `${_FS2}px serif`;
+          ctx.fillStyle = '#2c1400';
+          _bodyY = wrapText(ctx, para, _MX, _bodyY, W-_MX*2, _LH2);
+          _bodyY += _PGP;
+        }
+      });
+
+      // ── B-7. 署名エリア ──────────────────────────────
+      const _sigY = y + _pH - 50;
+      ctx.strokeStyle = 'rgba(140,90,24, 0.30)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(_MX+20, _sigY); ctx.lineTo(W-_MX-20, _sigY); ctx.stroke();
+      ctx.font = 'italic 14px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillStyle = 'rgba(78,36,10, 0.62)';
+      ctx.fillText('— 大阪おばちゃん占い師　謹白 —', W-_MX, y+_pH-24);
+
+      // ── B-8. 朱印（右下コーナー） ────────────────────────
+      // 証書らしさを最も強く出す要素
+      const _sx = W - _MX + 8;
+      const _sy = _sigY - 14;
+      const _sr = 36;
+      // 外リング（こげ茶）
+      ctx.strokeStyle = 'rgba(140,22,22, 0.75)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(_sx, _sy, _sr, 0, Math.PI*2); ctx.stroke();
+      // 内塗り（朱色・半透明）
+      ctx.fillStyle = 'rgba(190,30,30, 0.12)';
+      ctx.beginPath(); ctx.arc(_sx, _sy, _sr-3, 0, Math.PI*2); ctx.fill();
+      // 内リング
+      ctx.strokeStyle = 'rgba(160,28,28, 0.55)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(_sx, _sy, _sr-7, 0, Math.PI*2); ctx.stroke();
+      // 印文字「鑑」
+      ctx.font = 'bold 30px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(170,25,25, 0.70)';
+      ctx.fillText('鑑', _sx, _sy+10);
+
+      ctx.restore(); // クリップ解除
+
+      // ════════════════════════════════════════
+      // STEP C : 外枠（クリップ外で重ね描き）
+      // ════════════════════════════════════════
+      ctx.strokeStyle = '#180900'; ctx.lineWidth = 6;
+      roundRect(ctx, _PAD, y+_PAD, W-_PAD*2, _pH-_PAD*2, _CR);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(185,140,36, 0.80)'; ctx.lineWidth = 2;
+      roundRect(ctx, _PAD+8, y+_PAD+8, W-(_PAD+8)*2, _pH-(_PAD+8)*2, _CR-3);
+      ctx.stroke();
+
+      ctx.restore(); // 最外解除
+      y += _pH;
+    }
+
+    // ══ ラッキー情報パネル（TV番組風） ══
+    const nL = selectedFortune.lucky.length;
+    const p6H = 165;
+    // 暗い背景
+    ctx.fillStyle='rgba(0,0,0,0.75)'; ctx.fillRect(0,y,W,p6H);
+    // TVヘッダー（グラデーション流れるイメージ）
+    const p6hg=ctx.createLinearGradient(0,y,W,y+34);
+    p6hg.addColorStop(0,'#ff1493'); p6hg.addColorStop(0.5,'#ffd700'); p6hg.addColorStop(1,'#ff6b00');
+    ctx.fillStyle=p6hg; ctx.fillRect(0,y,W,34);
+    ctx.font='bold 15px sans-serif'; ctx.fillStyle='#fff'; ctx.textAlign='center';
+    ctx.lineWidth=3; ctx.strokeStyle='#000'; ctx.strokeText('⭐ 今日のラッキー情報 ⭐',W/2,y+23);
+    ctx.fillText('⭐ 今日のラッキー情報 ⭐',W/2,y+23);
+    const cw=W/nL;
+    selectedFortune.lucky.forEach((item,i)=>{
+      const lx=i*cw+cw/2;
+      if(i>0){ctx.strokeStyle='#ff149355';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(i*cw,y+34);ctx.lineTo(i*cw,y+p6H);ctx.stroke();}
+      ctx.font='36px sans-serif'; ctx.textAlign='center'; ctx.fillStyle=rc;
+      ctx.fillText(getLuckyEmoji(item.label,item.value),lx,y+82);
+      ctx.font='11px sans-serif'; ctx.fillStyle='#ff9fcc'; ctx.fillText(item.label,lx,y+102);
+      ctx.font=`bold ${item.value.length>8?14:16}px sans-serif`;
+      ctx.lineWidth=3; ctx.strokeStyle='#000'; ctx.strokeText(item.value,lx,y+128);
+      ctx.fillStyle='#fff200'; ctx.fillText(item.value,lx,y+128);
+    });
+    ctx.strokeStyle='#111'; ctx.lineWidth=5; ctx.strokeRect(0,y,W,p6H);
+    ctx.strokeStyle='#ff149344'; ctx.lineWidth=1.5; ctx.strokeRect(4,y+4,W-8,p6H-8);
+    y += p6H;
+
+    // ══ フッター ══
+    const ftH = 75;
+    const ftg=ctx.createLinearGradient(0,y,W,y+ftH);
+    ftg.addColorStop(0,'#000'); ftg.addColorStop(0.5,'#cc0055bb'); ftg.addColorStop(1,'#000');
+    ctx.fillStyle=ftg; ctx.fillRect(0,y,W,ftH);
+    ctx.strokeStyle='#ff149366'; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(0,y+2);ctx.lineTo(W,y+2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,y+ftH-2);ctx.lineTo(W,y+ftH-2);ctx.stroke();
+    ctx.font='bold 14px sans-serif'; otxt(ctx,'🔮 声占い ─ 大阪のおばちゃんが霊的に鑑定したで 🔮',W/2,y+32,3,'#000','#fff');
+    ctx.font='11px sans-serif'; otxt(ctx,'※ これはエンタメやで。でも気持ちはほんまもんや。知らんけど。',W/2,y+54,2,'#000','#ff9fcc');
+    ctx.strokeStyle='#111'; ctx.lineWidth=4; ctx.strokeRect(0,y,W,ftH);
+    y += ftH;
+
+    // 外枠ジグザグ（ピンク×黒）
+    ['#ff1493', '#000', osakaGold].forEach((col,ci)=>{
+      const amp=6+ci*3, st=14-ci*3, lw=4-ci;
+      ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.beginPath();
+      let fl=1; ctx.moveTo(0,0);
+      for(let i=0;i<=W;i+=st){ctx.lineTo(i,amp*fl);fl*=-1;}
+      for(let j=0;j<=y;j+=st){ctx.lineTo(W+amp*fl,j);fl*=-1;}
+      for(let i=W;i>=0;i-=st){ctx.lineTo(i,y+amp*fl);fl*=-1;}
+      for(let j=y;j>=0;j-=st){ctx.lineTo(amp*fl,j);fl*=-1;}
+      ctx.closePath(); ctx.stroke();
+    });
+
+    const fin=document.createElement('canvas');
+    fin.width=W; fin.height=y;
+    fin.getContext('2d').drawImage(canvas,0,0);
+    const a=document.createElement('a');
+    a.download='声占い鑑定書.png'; a.href=fin.toDataURL('image/png'); a.click();
+  }
+
+  // ── 星空 ──
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 130; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*4+1).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
+    starsEl.appendChild(s);
+  }
+
+  // ── 波形バー ──
+  const waveformEl = document.getElementById('waveform');
+  const NUM_BARS = 22;
+  const bars = [];
+  for (let i = 0; i < NUM_BARS; i++) {
+    const b = document.createElement('div');
+    b.className = 'bar';
+    waveformEl.appendChild(b);
+    bars.push(b);
+  }
+
+  // 運勢データは fortunes.js を参照
+
+  // ── 状態管理 ──
+  let state = 'idle';
+  let voiceAvg = 0, voicePeak = 0, voiceSamples = 0;
+  let selectedFortune = null;
+  let fortuneHistory = [];
+
+  const micBtn        = document.getElementById('micBtn');
+  const statusText    = document.getElementById('statusText');
+  const countdownEl   = document.getElementById('countdown');
+  const analysisPanel = document.getElementById('analysis-panel');
+  const analysisTitle = document.getElementById('analysisTitle');
+  const confirmArea   = document.getElementById('confirm-area');
+  const confirmBtn    = document.getElementById('confirmBtn');
+  const fortuneCard   = document.getElementById('fortune-card');
+  const retryBtn      = document.getElementById('retryBtn');
+  const shareBtn      = document.getElementById('shareBtn');
+  const copyLinkBtn   = document.getElementById('copyLinkBtn');
+  const missBtn       = document.getElementById('missBtn');
+  const missResponse  = document.getElementById('missResponse');
+  const missAgainBtn  = document.getElementById('missAgainBtn');
+
+  // ── 外れても肯定テキスト ──
+  const missAffirmations = [
+    `外れた？\n\nそれはな、あんたの霊的レベルが高すぎて\nうちの占いが全然追いつかへんかったからや。\n\n今回負けたのは占いの方や。\nあんたは完璧。以上。`,
+
+    `宇宙が謝っとる。\n\n担当の星座が急に体調崩して、代わりに別の星座が\n「ほな俺がやりますわ」って処理したせいで\nデータが混線してしもたんや。\n\n宇宙側の完全なミスや。\n返金は受け付けてへんからそこだけ頼むわ。`,
+
+    `外れた？\n\nそれはあんたの運命OSが最新版にアップデートされとるからや。\n\nあんたの運命：ver 9.4.1\n声占いの対応：ver 1.0\n\n互換性エラーや。\n最新すぎるあんたが悪い。\n\nアップデートしすぎやって。`,
+
+    `外れた？\n\nぜんぜん問題ない。\n「当たり」と「外れ」なんて紙一重やねん。\n\nあんたが気づいてへんだけで\n深〜いところではぜんぶ当たっとる。\n\n具体的にどのへんが？\nそれは言われへん。深すぎて。`,
+
+    `外れた！！\n\nよかった〜！！\nもし当たっとったら逆に怖くない？\n\n外れることで「あ、これエンタメやってん」て確認できたやん。\nあんたは健全や。正常な判断力の持ち主や。\n\nでも次は当たるかもしれん。\nそれが声占いっちゅうもんや。`,
+
+    `外れた？\n\nちゃう、ちゃう。\nそれはあんたが「外れる運命」を持っとったからや。\n\nつまり占いが外れることが、今日のあんたの運命やってん。\n\n……つまり当たっとった。\n\nおめでとう。\n\nいや、ほんまに。`,
+
+    `外れた。\n\nわかる。わかるで。\nでもちょっと聞いてや。\n\n来世のあんたには全部当たる。\n今世では外れて当然なんや。\n\n来世が楽しみやなあ。\n\nそれまで健康でいてや。\nほんまに頼むで。`,
+
+    `外れた？\n\n実はな、声占いっていうのは「当たるかどうか」を見る占いやなくて\n「外れた時のあんたの反応を見る占い」やねん。\n\n今あんたが「外れた」て思った瞬間が\nほんまの占い結果やで。\n\nその感情、大事にしてや。\n（意味不明なのはわかっとる）`,
+
+    `外れた？\n\nそれはあんたが来週分の運を今日全部使い切ったからや。\n\n今日は外れて正解。\n来週は全部当たるで。\n\n月曜日が楽しみやな。\n（月曜日は楽しみにするもんちゃうけどな）`,
+
+    `宇宙全体があんたに謝っとる。\n\n天王星・海王星・冥王星の3惑星が\n合同で「すんませんでした」て言うとる。\n\n木星も「俺も悪かった」て言うとる。\n木星は関係ないのに言うとる。\n\nそれほどあんたは尊い存在ってことや。\n\n天王星、泣いとるで。`,
+  ];
+  let missIndex = 0;
+
+  function showMissResponse() {
+    missResponse.innerHTML = missAffirmations[missIndex % missAffirmations.length]
+      .replace(/\n/g, '<br>');
+    missResponse.classList.add('visible');
+    missAgainBtn.classList.add('visible');
+    missBtn.textContent = '😭 やっぱどう考えても外れてるんやけど…';
+    missIndex++;
+  }
+
+  micBtn.addEventListener('click', () => { if (state === 'idle') startRecording(); });
+  confirmBtn.addEventListener('click', showFortune);
+  retryBtn.addEventListener('click', reset);
+  shareBtn.addEventListener('click', shareFortune);
+  copyLinkBtn.addEventListener('click', copyPageUrl);
+  missBtn.addEventListener('click', showMissResponse);
+  missAgainBtn.addEventListener('click', showMissResponse);
+
+  // ── 読み上げ ──
+  const readBtn = document.getElementById('readBtn');
+  readBtn.addEventListener('click', readFortune);
+
+  function readFortune() {
+    if (!selectedFortune || !window.speechSynthesis) return;
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+      readBtn.textContent = '🔊 おばちゃんが読み上げる';
+      readBtn.classList.remove('reading');
+      return;
+    }
+    const v = speechSynthesis.getVoices();
+    if (v.length > 0) { doSpeak(v); }
+    else { speechSynthesis.onvoiceschanged = () => { doSpeak(speechSynthesis.getVoices()); speechSynthesis.onvoiceschanged = null; }; }
+  }
+
+  function doSpeak(voices) {
+    // 女性音声の中で最も落ち着いた・年配寄りの声を優先
+    // Kyoko(macOS・落ち着き系) > Haruka(Windows) > Nanami > Ayumi > Google日本語
+    // ※ 男性音声は使用しない
+    const prefer = [
+      'Kyoko',            // macOS 女性（落ち着いた印象・最優先）
+      'Haruka',           // Windows 女性
+      'Nanami',           // Windows 女性（ニューラル系）
+      'Ayumi',            // Windows 女性（旧）
+      'Google 日本語女性', // Chrome/Android 女性
+      'Google 日本語',    // フォールバック（多くの環境で女性）
+    ];
+    let jaVoice = null;
+    for (const name of prefer) {
+      jaVoice = voices.find(v => v.name.includes(name) && v.lang.startsWith('ja'));
+      if (jaVoice) break;
+    }
+    // 上記になければ女性系を優先（male / man / 男 を除外）
+    if (!jaVoice) {
+      jaVoice = voices.find(v =>
+        v.lang.startsWith('ja') &&
+        !/male|man|男|Kenji|Ichiro|Otoya/i.test(v.name)
+      );
+    }
+    if (!jaVoice) jaVoice = voices.find(v => v.lang === 'ja-JP') || voices.find(v => v.lang.startsWith('ja'));
+
+    // ── 読み上げ用テキスト変換（読み間違い・不自然な区切りを修正） ──
+    function rd(t) {
+      return (t || '')
+        // 絵文字・記号除去
+        .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
+        .replace(/[⬛🟩🔵🟣🌟💀⚡☕🪑✦★☆▼▲◆◇【】]/g, '')
+        // ── 文脈依存の読み（複合語・長い方を先に処理） ──
+        .replace(/今日中/g,'きょうじゅう')
+        .replace(/一日中/g,'いちにちじゅう')
+        .replace(/明日中/g,'あしたじゅう')
+        .replace(/今日/g,'きょう')
+        .replace(/明日/g,'あした')
+        .replace(/今朝/g,'けさ')
+        .replace(/今夜/g,'こんや')
+        .replace(/今晩/g,'こんばん')
+        // ── 止まる系（「とどまる」誤読を防ぐ・複合形を先に処理） ──
+        .replace(/止まらへん/g,'とまらへん')
+        .replace(/止まらない/g,'とまらない')
+        .replace(/止まった/g,'とまった')
+        .replace(/止まって/g,'とまって')
+        .replace(/止まるで/g,'とまるで')
+        .replace(/止まる/g,'とまる')
+        .replace(/止まり/g,'とまり')
+        // ── 漢字・専門語の読み ──
+        .replace(/霊的/g,'れいてき').replace(/振動数/g,'しんどうすう')
+        .replace(/共鳴係数/g,'きょうめいけいすう').replace(/周波数/g,'しゅうはすう')
+        .replace(/一致率/g,'いっちりつ').replace(/前世/g,'ぜんせ')
+        .replace(/守護霊/g,'しゅごれい').replace(/帯電/g,'たいでん')
+        .replace(/鮮魚/g,'せんぎょ').replace(/臨界値/g,'りんかいち')
+        .replace(/引き寄せ/g,'ひきよせ').replace(/天敵/g,'てんてき')
+        .replace(/宇宙/g,'うちゅう').replace(/運命/g,'うんめい')
+        .replace(/超レア/g,'ちょうれあ').replace(/激レア/g,'げきれあ')
+        .replace(/呪われ/g,'のろわれ').replace(/鑑定/g,'かんてい')
+        .replace(/波動/g,'はどう').replace(/結界/g,'けっかい')
+        .replace(/覚醒/g,'かくせい').replace(/降臨/g,'こうりん')
+        .replace(/三毛猫/g,'みけねこ').replace(/靴下/g,'くつした')
+        .replace(/花びら/g,'はなびら').replace(/乗り換え/g,'のりかえ')
+        .replace(/豚骨/g,'とんこつ').replace(/醤油/g,'しょうゆ')
+        .replace(/残高/g,'ざんだか').replace(/確率/g,'かくりつ')
+        .replace(/直感/g,'ちょっかん').replace(/手書き/g,'てがき')
+        .replace(/折りたたみ/g,'おりたたみ').replace(/野良猫/g,'のらねこ')
+        .replace(/声占い/g,'こえうらない').replace(/吉方位/g,'きちほうい')
+        .replace(/大吉/g,'だいきち').replace(/競馬/g,'けいば')
+        .replace(/競輪/g,'けいりん').replace(/笑顔/g,'えがお')
+        .replace(/深呼吸/g,'しんこきゅう').replace(/鑑定書/g,'かんていしょ')
+        .replace(/帯域/g,'たいいき').replace(/同僚/g,'どうりょう')
+        .replace(/分岐点/g,'ぶんきてん').replace(/免除/g,'めんじょ')
+        .replace(/延滞/g,'えんたい').replace(/振動/g,'しんどう')
+        .replace(/境地/g,'きょうち').replace(/請求書/g,'せいきゅうしょ')
+        // ── 数値・記号 ──
+        // 小数点付き数値＋% → 「数値パーセント」に変換（TTS が自然に読む）
+        // 例: 2.7% → 2.7パーセント → にーてんなな パーセント
+        .replace(/(\d+(?:\.\d+)?)%/g,'$1パーセント')
+        // 上記パターンに引っかからなかった % 記号を念のため変換
+        .replace(/%/g,'パーセント')
+        .replace(/(\d+)倍/g,'$1ばい')
+        // ── アルファベット語 ──
+        .replace(/Wi-Fi/gi,'わいふぁい')
+        .replace(/ver\.?\s*([\d.]+)/gi,'バージョン$1')
+        .replace(/Mbps/gi,'めがびっと')
+        .replace(/ATM/gi,'えーてぃーえむ')
+        .replace(/BGM/gi,'びーじーえむ')
+        .replace(/SNS/gi,'えすえぬえす')
+        .replace(/NG/gi,'えぬじー')
+        .replace(/UP/gi,'あっぷ')
+        .replace(/MAX/gi,'まっくす')
+        // ── 関西弁の読みを自然に ──
+        // 「やで」「やん」「やろ」は区切らずそのまま読ませる
+        .replace(/気ぃつけ/g,'きいつけ')
+        .replace(/気ぃ/g,'きい')
+        .replace(/買うてや/g,'こうてや')
+        .replace(/買うて/g,'こうて')
+        .replace(/買うた/g,'こうた')
+        .replace(/食べへん/g,'たべへん')
+        .replace(/でけへん/g,'できへん')
+        .replace(/せえへん/g,'せーへん')
+        .replace(/あかん/g,'あかん')
+        .replace(/知らん/g,'しらん')
+        .replace(/ほんま/g,'ほんま')
+        .replace(/なんでやねん/g,'なんでやねん')
+        .replace(/どないすんねん/g,'どないすんねん')
+        .replace(/ほんまかいな/g,'ほんまかいな')
+        // ── 括弧類を間に変換 ──
+        .replace(/[（(][^）)]{0,20}[）)]/g, '、')
+        .replace(/[「」『』〔〕]/g,'、')
+        .replace(/——/g,'。')
+        .replace(/…/g,'、')
+        .replace(/　/g,'、')
+        .replace(/\s{2,}/g,' ')
+        .trim();
+    }
+
+    // ── セグメント定義 ──
+    const segs = [];
+    const addSeg = (text, rate, pitch, pause) => {
+      const t = rd(text);
+      if (t && t.trim().length > 0) segs.push({ text: t.trim(), rate, pitch, pause });
+    };
+    const addRaw = (text, rate, pitch, pause) => {
+      if (text && text.trim().length > 0) segs.push({ text: text.trim(), rate, pitch, pause });
+    };
+
+    // ──────────────────────────────────────────
+    // pitch 目標：0.74〜0.82（低め・年配感・若い女性感を抑制）
+    // rate  目標：0.62〜0.72（ゆっくり・貫禄）
+    // pause：長めに取って"間"を出す
+    // ──────────────────────────────────────────
+
+    // ── オープニング（ひと呼吸おいて、落ち着いた切り出し）──
+    const openers = {
+      futsuu:   'はい。鑑定結果が出ましたよ。まあ、ふつうの運命やけど、ちゃんと聞いてやってや。',
+      mamaa:    'はいはい。出てきましたよ。なかなかおもろい運命やで、これ。ちゃんと聞いてや。',
+      rare:     'おー。ちょっとええのが出てきたで。これ、レアやから大事にしてや。',
+      suurare:  'ちょっと待ってや。超レアが出てしもたがな。これ、大事にしてやよ。ほんまに。',
+      gekirare: 'あのね。ちょっと待ってや。激レアやないの。宇宙が始まって以来の珍事やで、これは。',
+      noroware: 'あのな。ごめんて。呪われた運命が出てしもたんや。でも、あんたのせいやないからね。聞いてや。',
+    };
+    // pitch 0.78：低め・落ち着き・年配感
+    addRaw(openers[currentRarity?.id] || 'はい。鑑定結果が出たで。聞いてやってや。', 0.68, 0.78, 1000);
+
+    // ── タイトル（1発話にまとめて細切れ感を排除・ゆっくり低め）──
+    const titleClean = rd(selectedFortune.title);
+    addRaw('今日のあんたの運命はね。' + titleClean + '。やで。', 0.62, 0.78, 1200);
+
+    // ── 本文（3行まとめ・細切れ感を減らす・ゆっくり低め）──
+    const bodyLines = selectedFortune.body.split('\n').filter(Boolean);
+    const chunks = [];
+    for (let i = 0; i < bodyLines.length; i += 3) {
+      chunks.push(bodyLines.slice(i, i + 3).join('。'));
+    }
+    chunks.forEach((chunk, ci) => {
+      const t = rd(chunk);
+      const isTsukkomi = /やねん|あかん|危険|なんで|どない|嘘|怖い/.test(t);
+      const isYasashii = /大丈夫|元気|頑張|ありがと|安心/.test(t);
+      // pitch を全体的に低く抑える（若い女性感の抑制）
+      const rate  = isTsukkomi ? 0.72 : isYasashii ? 0.64 : 0.68;
+      const pitch = isTsukkomi ? 0.82 : isYasashii ? 0.76 : 0.78;
+      const pause = ci === chunks.length - 1 ? 900 : 650;
+      if (t.trim().length > 0) segs.push({ text: t.trim(), rate, pitch, pause });
+    });
+
+    // ── ラッキー情報（落ち着いてまとめて）──
+    const luckyText = selectedFortune.lucky
+      .map(l => `${rd(l.label)}は${rd(l.value)}`)
+      .join('、');
+    addRaw('ほんで、ラッキー情報やけどね。' + luckyText + '、やで。', 0.68, 0.78, 900);
+
+    // ── 締め（1発話にまとめて自然に終わる）──
+    addRaw('はい、以上やで。今日も元気でいてやよ。ほんまに頼むで。知らんけどな。', 0.64, 0.76, 0);
+
+    readBtn.textContent = '⏹ 読み上げ中（タップで停止）';
+    readBtn.classList.add('reading');
+
+    let idx = 0;
+    function next() {
+      if (idx >= segs.length) {
+        readBtn.textContent = '🔊 おばちゃんが読み上げる';
+        readBtn.classList.remove('reading');
+        return;
+      }
+      const seg = segs[idx++];
+      const utt = new SpeechSynthesisUtterance(seg.text);
+      utt.lang    = 'ja-JP';
+      utt.rate    = seg.rate;
+      utt.pitch   = seg.pitch;
+      utt.volume  = 1.0;
+      if (jaVoice) utt.voice = jaVoice;
+      utt.onend   = () => setTimeout(next, seg.pause);
+      utt.onerror = () => {
+        readBtn.textContent = '🔊 おばちゃんが読み上げる';
+        readBtn.classList.remove('reading');
+      };
+      speechSynthesis.speak(utt);
+    }
+    next();
+  }
+
+  // ── 録音 ──
+  async function startRecording() {
+    const micAvailable = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    if (!micAvailable) { startFakeRecording(); return; }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      state = 'recording';
+      playPip();
+      micBtn.classList.add('recording');
+      micBtn.textContent = '🔴';
+      statusText.textContent = '聴いとるで……声に宿る運命、読み取ったるわ……';
+      waveformEl.classList.add('active');
+
+      let count = 5;
+      countdownEl.textContent = count;
+      const cdInterval = setInterval(() => {
+        count--;
+        if (count > 0) { countdownEl.textContent = count; }
+        else { countdownEl.textContent = ''; clearInterval(cdInterval); }
+      }, 1000);
+
+      const audioCtx = new AudioContext();
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      audioCtx.createMediaStreamSource(stream).connect(analyser);
+
+      const freqData = new Uint8Array(analyser.frequencyBinCount);
+      voiceAvg = 0; voicePeak = 0; voiceSamples = 0;
+
+      let animId;
+      const animateBars = () => {
+        analyser.getByteFrequencyData(freqData);
+        const frameAvg = freqData.reduce((a, b) => a + b, 0) / freqData.length;
+        voiceAvg = (voiceAvg * voiceSamples + frameAvg) / (voiceSamples + 1);
+        voiceSamples++;
+        voicePeak = Math.max(voicePeak, ...freqData);
+        bars.forEach((bar, i) => {
+          const val = freqData[i % freqData.length] || 0;
+          bar.style.height = Math.max(6, (val / 255) * 55 + Math.random() * 5) + 'px';
+        });
+        animId = requestAnimationFrame(animateBars);
+      };
+      animateBars();
+
+      setTimeout(() => {
+        cancelAnimationFrame(animId);
+        stream.getTracks().forEach(t => t.stop());
+        clearInterval(cdInterval);
+        countdownEl.textContent = '';
+        micBtn.classList.remove('recording');
+        micBtn.textContent = '🔮';
+        micBtn.disabled = true;
+        waveformEl.classList.remove('active');
+        bars.forEach(b => b.style.height = '10px');
+        state = 'analyzing';
+        startAnalysis();
+      }, 5000);
+
+    } catch (e) {
+      startFakeRecording();
+    }
+  }
+
+  // ── フォールバック録音 ──
+  function startFakeRecording() {
+    state = 'recording';
+    playPip();
+    micBtn.classList.add('recording');
+    micBtn.textContent = '🔴';
+    statusText.textContent = '霊的に感知しとるで……声なき声も読み取れるんや……';
+    waveformEl.classList.add('active');
+
+    voiceAvg  = Math.random() * 60 + 20;
+    voicePeak = Math.random() * 80 + 40;
+    voiceSamples = 50;
+
+    let count = 5;
+    countdownEl.textContent = count;
+    const cdInterval = setInterval(() => {
+      count--;
+      if (count > 0) { countdownEl.textContent = count; }
+      else { countdownEl.textContent = ''; clearInterval(cdInterval); }
+    }, 1000);
+
+    let animId;
+    const animateFakeBars = () => {
+      bars.forEach(bar => { bar.style.height = Math.max(6, Math.random() * 50 + 5) + 'px'; });
+      animId = requestAnimationFrame(animateFakeBars);
+    };
+    animateFakeBars();
+
+    setTimeout(() => {
+      cancelAnimationFrame(animId);
+      clearInterval(cdInterval);
+      countdownEl.textContent = '';
+      micBtn.classList.remove('recording');
+      micBtn.textContent = '🔮';
+      micBtn.disabled = true;
+      waveformEl.classList.remove('active');
+      bars.forEach(b => b.style.height = '10px');
+      state = 'analyzing';
+      startAnalysis();
+    }, 5000);
+  }
+
+  // ── 分析演出 ──
+  function startAnalysis() {
+    statusText.textContent = '声紋、ガチで解析しとるから待ってや……';
+    analysisPanel.style.display = 'block';
+    playDrumRoll();
+
+    const ids  = ['m1','m2','m3','m4','m5'];
+    const vids = ['mv1','mv2','mv3','mv4','mv5'];
+    const vals = ids.map(() => Math.floor(Math.random() * 55 + 35));
+
+    [0, 1].forEach(i => {
+      setTimeout(() => {
+        document.getElementById(ids[i]).style.width = vals[i] + '%';
+        document.getElementById(vids[i]).textContent = vals[i] + '%';
+      }, i * 500 + 200);
+    });
+
+    setTimeout(() => {
+      statusText.textContent = '⚠️ なんかおかしい値でたで……もっかいスキャンしたるわ……';
+      statusText.classList.add('error');
+      playErrorSound();
+      const fill3 = document.getElementById('m3');
+      const val3  = document.getElementById('mv3');
+      fill3.style.width = '70%';
+      fill3.classList.add('error-flash');
+      val3.textContent  = '！！ERROR！！';
+      val3.classList.add('error');
+
+      setTimeout(() => {
+        fill3.classList.remove('error-flash');
+        fill3.style.width = vals[2] + '%';
+        val3.textContent  = vals[2] + '%';
+        val3.classList.remove('error');
+        statusText.textContent = '再スキャン完了や。続けるで……';
+        statusText.classList.remove('error');
+      }, 1500);
+    }, 1400);
+
+    [3, 4].forEach(i => {
+      setTimeout(() => {
+        document.getElementById(ids[i]).style.width = vals[i] + '%';
+        document.getElementById(vids[i]).textContent = vals[i] + '%';
+      }, i * 500 + 3200);
+    });
+
+    setTimeout(() => {
+      analysisTitle.textContent = '── 解析、完了したで ──';
+      statusText.textContent = '運命、全部読み解いたで。受け取る覚悟あるか？';
+      confirmArea.style.display = 'block';
+    }, 5200);
+  }
+
+  // ── 運勢表示 ──
+  function showFortune() {
+    confirmArea.style.display = 'none';
+
+    // 重複防止
+    let candidates = fortunes.filter((_, i) => !fortuneHistory.includes(i));
+    if (candidates.length === 0) { fortuneHistory = []; candidates = fortunes; }
+    const idx = fortunes.indexOf(candidates[Math.floor(Math.random() * candidates.length)]);
+    fortuneHistory.push(idx);
+    if (fortuneHistory.length > 3) fortuneHistory.shift();
+    selectedFortune = fortunes[idx];
+    currentRarity   = pickRarity();
+
+    // 煽りテキスト
+    document.getElementById('odanText').textContent =
+      odanTexts[Math.floor(Math.random() * odanTexts.length)];
+
+    // レアリティ
+    const rarityWrap    = document.getElementById('rarityWrap');
+    const rarityBadge   = document.getElementById('rarityBadge');
+    const rarityComment = document.getElementById('rarityComment');
+    rarityBadge.textContent   = currentRarity.label;
+    rarityBadge.className     = `rarity-badge r-${currentRarity.id}`;
+    rarityComment.textContent = currentRarity.comment;
+    rarityComment.className   = `rarity-comment r-${currentRarity.id}`;
+    rarityWrap.style.display  = 'flex';
+
+    // SFX
+    const sfxEl = document.getElementById('sfxDisplay');
+    sfxEl.textContent = sfxLabel[currentRarity.id] || 'ドン！';
+    sfxEl.style.color = rarityHex[currentRarity.id] || '#ffd700';
+    document.getElementById('sfxWrap').style.display = 'flex';
+
+    // 鑑定結果
+    document.getElementById('fortuneTitle').textContent = selectedFortune.title;
+
+    // 関西弁フレーズ
+    const kansaiPhrases = [
+      'なんでやねん！！','気ぃつけや！！','ほんまやで！！',
+      'えっ、マジで！？','あかんわこれ！！','しっかりせえや！',
+      'どないすんねん！！','ほんまかいな！？','びっくりやわ！！',
+      'やめてぇな〜！！',
+    ];
+    const kansaiEl = document.getElementById('kansaiPhrase');
+    kansaiEl.textContent = kansaiPhrases[Math.floor(Math.random() * kansaiPhrases.length)];
+    kansaiEl.style.display = 'block';
+
+    // ツッコミ
+    document.getElementById('tsukkomiText').textContent =
+      tsukkomiTexts[Math.floor(Math.random() * tsukkomiTexts.length)];
+    document.getElementById('tsukkomiWrap').style.display = 'block';
+
+    // 声の鑑定書（\nをそのまま改行として表示）
+    document.getElementById('voiceComment').innerHTML =
+      getVoiceComment(voiceAvg, voicePeak).replace(/\n/g, '<br>');
+
+    // 詳細説明（2文ずつまとめて段落にする）
+    {
+      const lines = selectedFortune.body.split('\n').filter(Boolean);
+      const groups = [];
+      for (let i = 0; i < lines.length; i += 2) {
+        groups.push(lines.slice(i, i + 2).join(''));
+      }
+      document.getElementById('fortuneBody').innerHTML =
+        groups.map(g => `<p style="margin:0 0 .9em">${g}</p>`).join('');
+    }
+
+    // ラッキー情報
+    const luckyEl = document.getElementById('fortuneLucky');
+    luckyEl.innerHTML = '';
+    selectedFortune.lucky.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'lucky-item';
+      div.innerHTML = `
+        <div class="lucky-emoji">${getLuckyEmoji(item.label, item.value)}</div>
+        <div class="lucky-label">${item.label}</div>
+        <div class="lucky-value">${item.value}</div>
+      `;
+      luckyEl.appendChild(div);
+    });
+
+    // ポジティブメッセージ
+    const posMsgs = [
+      '今日も一日、笑顔と大きな声で過ごしてや！\nあんたが笑うだけで周りまで明るなるで！',
+      'どんな運命でも、あんたなら乗り越えられるで！\n今日も全力でいってみよ！',
+      '声出して、胸張って、今日も元気にいってらっしゃい！\n宇宙があんたを応援しとるで！',
+      'なにがあっても大丈夫！あんたには運がついとる！\n今日も笑顔で、ええ一日にしてや！',
+      '深呼吸して、前向いて、いってらっしゃい！\n今日のあんた、なかなかええで！',
+    ];
+    const pmEl = document.getElementById('positiveMsg');
+    pmEl.innerHTML = `<span class="pos-label">✦ おばちゃんからひと言 ✦</span>${posMsgs[Math.floor(Math.random()*posMsgs.length)].replace(/\n/g,'<br>')}`;
+
+    fortuneCard.style.display = 'block';
+    statusText.textContent = '✨ 今日のあんたの運命、全部わかってしもたで！';
+    state = 'done';
+    playFanfare(currentRarity.id);
+  }
+
+  async function copyPageUrl() {
+    const url = window.location.href;
+    const okLabel = '✅ URLコピーしたで！';
+    const failLabel = '❌ コピーできへんかった';
+    const baseLabel = '🔗 このページのURLをコピー';
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      copyLinkBtn.textContent = okLabel;
+      copyLinkBtn.classList.add('copied');
+      setTimeout(() => {
+        copyLinkBtn.textContent = baseLabel;
+        copyLinkBtn.classList.remove('copied');
+      }, 2200);
+    } catch (e) {
+      copyLinkBtn.textContent = failLabel;
+      setTimeout(() => { copyLinkBtn.textContent = baseLabel; }, 2000);
+    }
+  }
+
+  // ── 画像保存 ──
+  function shareFortune() {
+    if (!selectedFortune) return;
+    try {
+      downloadFortuneImage();
+      shareBtn.textContent = '✅ 画像保存したで！';
+      shareBtn.classList.add('copied');
+      setTimeout(() => {
+        shareBtn.textContent = '🖼 画像で保存';
+        shareBtn.classList.remove('copied');
+      }, 2500);
+    } catch(e) {
+      shareBtn.textContent = '❌ 保存失敗やん';
+      setTimeout(() => { shareBtn.textContent = '🖼 画像で保存'; }, 2000);
+    }
+  }
+
+  // ── リセット ──
+  function reset() {
+    state = 'idle';
+    voiceAvg = voicePeak = voiceSamples = 0;
+    selectedFortune = null;
+    micBtn.disabled = false;
+    micBtn.textContent = '🎤';
+    statusText.textContent = 'ボタン押して、なんか喋ってみ？';
+    statusText.classList.remove('error');
+    analysisPanel.style.display = 'none';
+    confirmArea.style.display   = 'none';
+    fortuneCard.style.display   = 'none';
+    analysisTitle.textContent   = '── 声紋、調べたるわ ──';
+    countdownEl.textContent     = '';
+    ['m1','m2','m3','m4','m5'].forEach(id => {
+      const el = document.getElementById(id);
+      el.style.width = '0%'; el.classList.remove('error-flash');
+    });
+    ['mv1','mv2','mv3','mv4','mv5'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = '調べてるで…'; el.classList.remove('error');
+    });
+    bars.forEach(b => b.style.height = '10px');
+    if (window.speechSynthesis && speechSynthesis.speaking) speechSynthesis.cancel();
+    readBtn.textContent = '🔊 おばちゃんが読み上げる';
+    readBtn.classList.remove('reading');
+    missIndex = 0;
+    currentRarity = null;
+    missBtn.textContent = '😢 外れてるんやけど…';
+    missResponse.classList.remove('visible');
+    missResponse.innerHTML = '';
+    missAgainBtn.classList.remove('visible');
+    document.getElementById('sfxWrap').style.display = 'none';
+    document.getElementById('kansaiPhrase').style.display = 'none';
+    document.getElementById('tsukkomiWrap').style.display = 'none';
+    document.getElementById('odanText').textContent = '';
+    document.getElementById('rarityWrap').style.display = 'none';
+    shareBtn.textContent = '🖼 画像で保存';
+    shareBtn.classList.remove('copied');
+    copyLinkBtn.textContent = '🔗 このページのURLをコピー';
+    copyLinkBtn.classList.remove('copied');
+  }
+</script>
+</body>
+</html>

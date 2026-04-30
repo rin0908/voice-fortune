@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>声占いアプリ 鑑定パターン追加手順書</title>
+<style>
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+    background: #fff8f0;
+    color: #222;
+    line-height: 1.8;
+  }
+  h1 {
+    background: linear-gradient(135deg, #cc0066, #ff69b4);
+    color: #fff;
+    padding: 20px 24px;
+    border-radius: 12px;
+    font-size: 1.4em;
+    margin-bottom: 8px;
+  }
+  h2 {
+    border-left: 6px solid #ff69b4;
+    padding-left: 12px;
+    margin-top: 40px;
+    color: #cc0055;
+  }
+  h3 { color: #333; margin-top: 28px; }
+  .step {
+    background: #fff;
+    border: 2px solid #ffb3d1;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .step-num {
+    display: inline-block;
+    background: #ff69b4;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    text-align: center;
+    line-height: 28px;
+    margin-right: 8px;
+    font-size: 0.9em;
+  }
+  code {
+    background: #f0f0f0;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 0.95em;
+    color: #cc3300;
+  }
+  pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 0.92em;
+    line-height: 1.7;
+    margin: 12px 0;
+  }
+  pre .comment { color: #6a9955; }
+  pre .string { color: #ce9178; }
+  pre .key { color: #9cdcfe; }
+  pre .emoji { color: #ffd700; }
+  .tip {
+    background: #fffde7;
+    border: 2px solid #ffd600;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+  }
+  .tip::before { content: "💡 ポイント："; font-weight: bold; color: #856a00; }
+  .warn {
+    background: #fff0f0;
+    border: 2px solid #ff6666;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+  }
+  .warn::before { content: "⚠️ 注意："; font-weight: bold; color: #cc0000; }
+  .ok {
+    background: #f0fff4;
+    border: 2px solid #66cc88;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+  }
+  .ok::before { content: "✅ OK例："; font-weight: bold; color: #006622; }
+  .file-icon { font-size: 1.2em; margin-right: 6px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+  }
+  th {
+    background: #ff69b4;
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  td {
+    border: 1px solid #ffb3d1;
+    padding: 10px 14px;
+    background: #fff;
+  }
+  tr:nth-child(even) td { background: #fff5f9; }
+</style>
+</head>
+<body>
+
+<h1>🔮 声占いアプリ<br>鑑定パターン追加・編集 手順書</h1>
+<p style="color:#666; margin-top:4px;">初心者でもできる！ わかりやすく説明するで。</p>
+
+<!-- ===== ファイル構成 ===== -->
+<h2>📁 ファイルの場所</h2>
+
+<table>
+  <tr>
+    <th>ファイル名</th>
+    <th>何をするファイル？</th>
+    <th>触る？</th>
+  </tr>
+  <tr>
+    <td><span class="file-icon">📄</span><code>index.html</code></td>
+    <td>アプリ本体。デザインや動きが全部入っとる</td>
+    <td>基本触らない</td>
+  </tr>
+  <tr>
+    <td><span class="file-icon">⭐</span><code>fortunes.js</code></td>
+    <td>鑑定パターン・煽り・ツッコミのデータだけが入っとる</td>
+    <td><strong>ここを編集する！</strong></td>
+  </tr>
+</table>
+
+<!-- ===== 開き方 ===== -->
+<h2>📂 fortunes.js の開き方</h2>
+
+<h3>⭐ Cursor で開く場合（おすすめ）</h3>
+
+<div class="step">
+  <span class="step-num">1</span>
+  Cursor を起動する
+</div>
+<div class="step">
+  <span class="step-num">2</span>
+  メニュー「ファイル」→「フォルダーを開く」を選ぶ<br>
+  （またはショートカット <code>Ctrl + Shift + O</code>）
+</div>
+<div class="step">
+  <span class="step-num">3</span>
+  <code>C:\Users\heart\voice-fortune</code> フォルダを選んで「フォルダーの選択」をクリック
+</div>
+<div class="step">
+  <span class="step-num">4</span>
+  左側のファイル一覧に <code>fortunes.js</code> が出てくるのでクリックして開く
+</div>
+<div class="step">
+  <span class="step-num">5</span>
+  編集して <code>Ctrl + S</code> で保存する
+</div>
+<div class="step">
+  <span class="step-num">6</span>
+  ブラウザで <code>index.html</code> を開き直す（タブを閉じて再度開く）
+</div>
+
+<div class="tip">フォルダごと開く方法が一番ラク！一回やったら次からCursorを起動するたびに自動で開くようになるで。</div>
+
+<h3>🗒️ メモ帳で開く場合</h3>
+
+<div class="step">
+  <span class="step-num">1</span>
+  エクスプローラーで <code>C:\Users\heart\voice-fortune\</code> を開く
+</div>
+<div class="step">
+  <span class="step-num">2</span>
+  <code>fortunes.js</code> を右クリック
+</div>
+<div class="step">
+  <span class="step-num">3</span>
+  「プログラムから開く」→「メモ帳」を選ぶ
+</div>
+<div class="step">
+  <span class="step-num">4</span>
+  編集して <code>Ctrl + S</code> で保存する
+</div>
+<div class="step">
+  <span class="step-num">5</span>
+  ブラウザで <code>index.html</code> を開き直す（タブを閉じて再度開く）
+</div>
+
+<div class="tip">AIに「この内容で鑑定パターンを追加して」と頼むのが一番ラクやで！</div>
+
+<!-- ===== 1パターンの構造 ===== -->
+<h2>🔑 1パターンの構造（必ず読んで）</h2>
+
+<p>鑑定パターンは以下の4つのセットで1つや：</p>
+
+<table>
+  <tr><th>項目</th><th>説明</th><th>例</th></tr>
+  <tr><td><code>title</code></td><td>結果のタイトル（絵文字＋短い言葉）</td><td>🐟 魚に呼ばれる日</td></tr>
+  <tr><td><code>body</code></td><td>本文（関西弁・3〜5文）</td><td>今日の16時43分、...</td></tr>
+  <tr><td><code>lucky</code></td><td>ラッキー情報（3個セット）</td><td>ラッキー魚：サバ</td></tr>
+</table>
+
+<p>実際のコードはこう書く：</p>
+
+<pre>
+<span class="comment">// ↓ ここから1パターン</span>
+{
+  <span class="key">title</span>: <span class="string">"🍣 寿司に呼ばれる日"</span>,
+  <span class="key">body</span>: <span class="string">"今日の昼、絶対寿司が食べたくなるで。\n我慢したらアカン——それが今日の運命や。\nマグロを食べたら運気MAX。卵焼きは今日だけ天敵やから気ぃつけてや。"</span>,
+  <span class="key">lucky</span>: [
+    { <span class="key">label</span>: <span class="string">"ラッキーネタ"</span>,  <span class="key">value</span>: <span class="string">"マグロ"</span> },
+    { <span class="key">label</span>: <span class="string">"NGネタ"</span>,      <span class="key">value</span>: <span class="string">"卵焼き（今日だけ）"</span> },
+    { <span class="key">label</span>: <span class="string">"食べる時間"</span>,  <span class="key">value</span>: <span class="string">"昼がベスト"</span> },
+  ]
+},
+<span class="comment">// ↑ ここまで1パターン。最後の , を忘れずに！</span>
+</pre>
+
+<div class="warn">
+  <code>"</code>（ダブルクォーテーション）を消したり、<code>{</code> <code>}</code> を消したりするとアプリが壊れるで。コピーして使うのが安全や！
+</div>
+
+<!-- ===== 追加手順 ===== -->
+<h2>➕ パターンを追加する手順</h2>
+
+<div class="step">
+  <span class="step-num">1</span>
+  <code>fortunes.js</code> をメモ帳で開く
+</div>
+<div class="step">
+  <span class="step-num">2</span>
+  <code>Ctrl + End</code> でファイルの一番下に移動する
+</div>
+<div class="step">
+  <span class="step-num">3</span>
+  こういう行が見つかる：
+  <pre>  ];    <span class="comment">← これが fortunes配列の終わり</span></pre>
+</div>
+<div class="step">
+  <span class="step-num">4</span>
+  その <code>];</code> の直前の行（最後の <code>},</code> のあと）に新しいパターンを貼り付ける
+</div>
+<div class="step">
+  <span class="step-num">5</span>
+  <code>Ctrl + S</code> で保存してブラウザを開き直す
+</div>
+
+<div class="ok">
+<pre>
+    ...前のパターン...,   <span class="comment">← 前のパターンの最後</span>
+    {
+      title: "🍣 寿司に呼ばれる日",
+      body: "本文をここに書く。",
+      lucky: [
+        { label: "ラッキーアイテム", value: "マグロ" },
+        { label: "NG", value: "卵焼き" },
+        { label: "時間", value: "昼" },
+      ]
+    },                    <span class="comment">← ここに追加した</span>
+  ];                      <span class="comment">← この];は動かさない</span>
+</pre>
+</div>
+
+<!-- ===== 本文の書き方 ===== -->
+<h2>📝 本文（body）の書き方</h2>
+
+<table>
+  <tr><th>ルール</th><th>説明</th></tr>
+  <tr><td>改行は <code>\n</code> で書く</td><td>実際に画面で改行される</td></tr>
+  <tr><td>ダブルクォーテーション <code>"</code> で囲む</td><td>前後に必ず <code>"</code> を付ける</td></tr>
+  <tr><td>本文中に <code>"</code> を使いたい場合</td><td><code>「」</code> か <code>''</code> を使う</td></tr>
+  <tr><td>長さ</td><td>3〜5文がちょうどええ</td></tr>
+</table>
+
+<h3>例：</h3>
+<pre>
+body: <span class="string">"今日の昼、絶対寿司が食べたくなるで。\n我慢したらアカン。\nマグロを食べたら今月の運気がUPするで。"</span>
+</pre>
+
+<!-- ===== 煽り・ツッコミ ===== -->
+<h2>💬 煽り・ツッコミを追加する</h2>
+
+<p><code>fortunes.js</code> の下の方に <code>odanTexts</code>（煽り）と <code>tsukkomiTexts</code>（ツッコミ）がある。</p>
+
+<pre>
+<span class="comment">// 煽りテキスト（占い前に出るやつ）</span>
+const odanTexts = [
+  <span class="string">'ズバリ言うで！！'</span>,
+  <span class="string">'ヤバいやつ出たで！！'</span>,
+  <span class="string">'ここに追加したい文を書く！！'</span>,   <span class="comment">← こうやって追加</span>
+];
+
+<span class="comment">// ツッコミテキスト（結果の下に出るやつ）</span>
+const tsukkomiTexts = [
+  <span class="string">'ほんまかいな！！笑'</span>,
+  <span class="string">'ここに追加したい文を書く！！'</span>,   <span class="comment">← こうやって追加</span>
+];
+</pre>
+
+<div class="tip">文字列は <code>'</code>（シングルクォーテーション）で囲んで、最後に <code>,</code> を付けるで！</div>
+
+<!-- ===== よくあるミス ===== -->
+<h2>❌ よくあるミス</h2>
+
+<table>
+  <tr><th>ミス</th><th>正しい書き方</th></tr>
+  <tr>
+    <td><code>title: 寿司に呼ばれる日</code><br>（クォーテーションなし）</td>
+    <td><code>title: "🍣 寿司に呼ばれる日"</code></td>
+  </tr>
+  <tr>
+    <td>最後の <code>,</code> 忘れ</td>
+    <td><code>},</code> で閉じる（カンマ必須）</td>
+  </tr>
+  <tr>
+    <td>本文に改行を直接入れた</td>
+    <td><code>\n</code> で改行を表現する</td>
+  </tr>
+  <tr>
+    <td><code>{</code> か <code>}</code> のどちらかが足りない</td>
+    <td>必ずペアで書く</td>
+  </tr>
+</table>
+
+<!-- ===== 確認方法 ===== -->
+<h2>✅ 追加できたか確認する方法</h2>
+
+<div class="step">
+  <span class="step-num">1</span>
+  <code>index.html</code> をブラウザで開く（タブを完全に閉じてから開き直す）
+</div>
+<div class="step">
+  <span class="step-num">2</span>
+  マイクボタンを押して占いを実行する
+</div>
+<div class="step">
+  <span class="step-num">3</span>
+  追加したパターンがランダムで出てきたら成功！
+</div>
+
+<div class="tip">パターンが100個以上あるのでランダムで出るまで何回か占ってみてや！</div>
+
+<div class="warn">
+  ブラウザが真っ白になったり動かなくなったら <code>fortunes.js</code> に書き間違いがある可能性があるで。AIに「確認して」と頼んだら直してもらえるで！
+</div>
+
+<!-- ===== AIへの頼み方 ===== -->
+<h2>🤖 AIへの頼み方（コピペして使ってや）</h2>
+
+<div class="step">
+  <strong>パターン追加の場合：</strong><br>
+  「fortunes.jsに以下の内容でパターンを追加して。<br>
+  タイトル：○○の日<br>
+  内容：○○（関西弁で）<br>
+  ラッキー：○○・○○・○○」
+</div>
+
+<div class="step">
+  <strong>まとめて追加の場合：</strong><br>
+  「fortunes.jsに○○系のパターンを10個追加して。関西弁・ネタ感あり・短め」
+</div>
+
+<div class="step">
+  <strong>既存パターンを変えたい場合：</strong><br>
+  「fortunes.jsの「○○の日」の本文を以下に変えて：○○○」
+</div>
+
+<!-- ===== 公開方法 ===== -->
+<h2>🌐 みんなに使ってもらう方法（Netlify）</h2>
+
+<div class="tip">完全無料！クレジットカードもアカウントも不要やで！</div>
+
+<table>
+  <tr><th>項目</th><th>内容</th></tr>
+  <tr><td>料金</td><td><strong>0円</strong></td></tr>
+  <tr><td>月間アクセス数</td><td>100GB分（友達が何百人使っても余裕）</td></tr>
+  <tr><td>URL</td><td>自動でもらえる（例：○○○.netlify.app）</td></tr>
+  <tr><td>マイク機能</td><td>問題なく使える</td></tr>
+  <tr><td>クレジットカード</td><td>不要</td></tr>
+</table>
+
+<h3>📤 公開手順（初回）</h3>
+
+<div class="step">
+  <span class="step-num">1</span>
+  ブラウザで <code>netlify.com/drop</code> を開く
+</div>
+<div class="step">
+  <span class="step-num">2</span>
+  エクスプローラーで <code>C:\Users\heart\voice-fortune</code> フォルダを開く
+</div>
+<div class="step">
+  <span class="step-num">3</span>
+  フォルダをそのままブラウザの画面に<strong>ドラッグ＆ドロップ</strong>する
+</div>
+<div class="step">
+  <span class="step-num">4</span>
+  しばらく待つと <code>https://○○○○○.netlify.app</code> というURLが出てくる
+</div>
+<div class="step">
+  <span class="step-num">5</span>
+  そのURLをLINEやSNSで友達に送るだけ！
+</div>
+
+<div class="warn">
+  フォルダの中に <code>index.html</code> と <code>fortunes.js</code> が両方入っていることを確認してや！
+</div>
+
+<h3>🔄 内容を更新した時（鑑定パターンを追加したあとなど）</h3>
+
+<div class="step">
+  <span class="step-num">1</span>
+  また同じように <code>netlify.com/drop</code> を開く
+</div>
+<div class="step">
+  <span class="step-num">2</span>
+  フォルダをドラッグ＆ドロップする
+</div>
+<div class="step">
+  <span class="step-num">3</span>
+  新しいURLが発行される（前のURLとは変わることがある）
+</div>
+<div class="step">
+  <span class="step-num">4</span>
+  新しいURLを友達に送り直す
+</div>
+
+<div class="tip">
+  毎回URLが変わるのが気になる場合は、Netlifyに無料アカウントを作ると同じURLを使い続けられるで。アカウント登録はメールアドレスだけでOKや！
+</div>
+
+<hr style="margin-top:50px; border-color:#ffb3d1;">
+<p style="text-align:center; color:#888; font-size:0.9em;">
+  声占いアプリ 鑑定データ手順書<br>
+  わからんことがあったらAIに聞いてや！
+</p>
+
+</body>
+</html>
