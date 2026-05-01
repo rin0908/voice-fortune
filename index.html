@@ -202,9 +202,9 @@
     .odan-text {
       font-size:clamp(2.2rem,8.5vw,4rem);
       font-weight:900; color:#fff200; text-align:center;
-      margin:.3rem 0 .8rem; line-height:1.15;
+      margin:.3rem 0 .8rem; line-height:1.2;
       display:block; width:100%;
-      word-break:break-all; overflow-wrap:break-word;
+      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
       animation:odan-shake .7s infinite alternate;
       text-shadow:
         -4px -4px 0 #000, 4px -4px 0 #000,
@@ -276,8 +276,9 @@
     .fortune-title {
       font-size:clamp(2.6rem,10.5vw,5.2rem);
       font-weight:900; color:#ff1493; text-align:center;
-      line-height:1.2; margin:.5rem 0 .5rem; letter-spacing:1px;
-      word-break:break-all; overflow-wrap:break-word;
+      line-height:1.25; margin:.5rem 0 .5rem; letter-spacing:1px;
+      white-space:pre-line;
+      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
       text-shadow:
         -4px -4px 0 #000, 4px -4px 0 #000,
         -4px  4px 0 #000, 4px  4px 0 #000,
@@ -314,7 +315,7 @@
       font-size:clamp(1.4rem,5.5vw,2.1rem); font-weight:900;
       color:#cc0055; text-align:center;
       box-shadow:5px 5px 0 #000,0 0 18px #ff149344;
-      word-break:break-all; overflow-wrap:break-word;
+      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
     }
     .tsukkomi::before{content:'💬 ';font-size:.8em;}
 
@@ -347,7 +348,8 @@
       line-height: 2.8;
       box-shadow: 5px 8px 24px rgba(0,0,0,.45);
       width: 100%;
-      word-break: break-word;
+      word-break: keep-all;
+      line-break: strict;
       overflow-wrap: break-word;
       white-space: normal;
       text-align: left;
@@ -385,7 +387,7 @@
     .fortune-body {
       font-size:clamp(1.15rem,4.5vw,1.4rem); line-height:2.4;
       color:#fff; margin:0 0 1.4rem;
-      word-break:break-word; overflow-wrap:break-word;
+      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
       font-weight:normal; text-align:left;
       background:rgba(0,0,0,.5); border-radius:12px;
       padding:1.4rem 1.6rem; border-left:4px solid #ffd700;
@@ -424,7 +426,7 @@
     .lucky-label{font-size:1rem;color:#ff9fcc;letter-spacing:1px;text-align:center;margin-top:.2rem;}
     .lucky-value{
       font-size:clamp(1.1rem,4.5vw,1.35rem); color:#fff200;
-      font-weight:900; text-align:center; word-break:break-word;
+      font-weight:900; text-align:center; word-break:keep-all; line-break:strict; overflow-wrap:break-word;
       text-shadow:1px 1px 0 #000,0 0 8px #ff1493;
     }
 
@@ -436,7 +438,7 @@
       font-weight:bold; color:#4ade80; text-align:center;
       line-height:2.0; margin-bottom:1.2rem;
       text-shadow:1px 1px 0 #000; box-shadow:4px 4px 0 #000;
-      word-break:break-word;
+      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
     }
     .positive-msg .pos-label{
       font-size:.78rem; color:#4ade8077; letter-spacing:3px;
@@ -1072,17 +1074,26 @@
     ctx.restore();
     ctx.font='bold 10px sans-serif'; otxt(ctx,'▼ 今日のあんたの運命 ▼',W/2,y+18,0,'','#555');
     const rawTitle = selectedFortune.title;
-    const titleLen = rawTitle.replace(/[\u{1F000}-\u{1FAFF}]/gu,'').replace(/[^\u0000-\u007F]/g,'X').length;
-    let titleSz = titleLen>14?40:titleLen>10?52:titleLen>7?62:72;
-    ctx.font=`bold ${titleSz}px sans-serif`;
-    while(ctx.measureText(rawTitle).width > W-32 && titleSz > 18){
-      titleSz -= 2; ctx.font=`bold ${titleSz}px sans-serif`;
+    const titleLines = String(rawTitle).split(/\n/).map(s => s.trim()).filter(Boolean);
+    const flatLen = titleLines.join('').replace(/[\u{1F000}-\u{1FAFF}]/gu,'').replace(/[^\u0000-\u007F]/g,'X').length;
+    let titleSz = flatLen>14?40:flatLen>10?52:flatLen>7?62:72;
+    const maxTW = W - 32;
+    function titleFits(sz) {
+      ctx.font = `bold ${sz}px sans-serif`;
+      return titleLines.every(line => ctx.measureText(line).width <= maxTW);
     }
-    const titleY = y + p3H/2 + titleSz*0.36;
-    ctx.textAlign='center';
-    ctx.lineWidth=16; ctx.strokeStyle='#000'; ctx.strokeText(rawTitle,W/2,titleY);
-    ctx.lineWidth=8;  ctx.strokeStyle='#ff69b4'; ctx.strokeText(rawTitle,W/2,titleY);
-    ctx.fillStyle=osakaHot; ctx.fillText(rawTitle,W/2,titleY);
+    while (titleSz > 18 && !titleFits(titleSz)) titleSz -= 2;
+    ctx.font = `bold ${titleSz}px sans-serif`;
+    const lineGap = titleSz * 1.18;
+    const blockH = titleLines.length * lineGap;
+    let lineY = y + p3H / 2 - blockH / 2 + titleSz * 0.35;
+    ctx.textAlign = 'center';
+    titleLines.forEach(line => {
+      ctx.lineWidth = 16; ctx.strokeStyle = '#000'; ctx.strokeText(line, W / 2, lineY);
+      ctx.lineWidth = 8;  ctx.strokeStyle = '#ff69b4'; ctx.strokeText(line, W / 2, lineY);
+      ctx.fillStyle = osakaHot; ctx.fillText(line, W / 2, lineY);
+      lineY += lineGap;
+    });
     ctx.strokeStyle='#111'; ctx.lineWidth=5.5; ctx.strokeRect(0,y,W,p3H);
     y += p3H;
 
@@ -1475,6 +1486,7 @@
     // ── 読み上げ用テキスト変換（読み間違い・不自然な区切りを修正） ──
     function rd(t) {
       return (t || '')
+        .replace(/\r?\n/g, '')
         // 絵文字・記号除去
         .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
         .replace(/[⬛🟩🔵🟣🌟💀⚡☕🪑✦★☆▼▲◆◇【】]/g, '')
