@@ -192,6 +192,10 @@
       animation:fadeSlide .6s ease; text-align:center;
       box-shadow:0 0 60px #ffd70055,8px 8px 0 #000;
       overflow:visible;
+      /* 日本語：語の途中でバラさないよう UA の禁則処理に任せる（パターンごとの手修正は不要） */
+      line-break: strict;
+      word-break: normal;
+      overflow-wrap: anywhere;
     }
     .fortune-header{
       font-size:.85rem; color:#ffd700; letter-spacing:4px;
@@ -204,7 +208,6 @@
       font-weight:900; color:#fff200; text-align:center;
       margin:.3rem 0 .8rem; line-height:1.2;
       display:block; width:100%;
-      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
       animation:odan-shake .7s infinite alternate;
       text-shadow:
         -4px -4px 0 #000, 4px -4px 0 #000,
@@ -273,12 +276,11 @@
     @keyframes sfx-pop{from{transform:scale(.97) rotate(-4deg)}to{transform:scale(1.07) rotate(2deg)}}
 
     /* 4. 超デカ鑑定結果（主役） */
-    /* タイトルは JS で1行=span.ft-line（\n 強制・ブラウザ差を回避） */
+    /* タイトル：\\n があるときだけ span.ft-line で行分割。無いときは1行＝親の禁則と同じ */
     .fortune-title {
       font-size:clamp(2.6rem,10.5vw,5.2rem);
       font-weight:900; color:#ff1493; text-align:center;
       line-height:1.25; margin:.5rem 0 .5rem; letter-spacing:1px;
-      word-break:normal; line-break:strict; overflow-wrap:anywhere;
       text-shadow:
         -4px -4px 0 #000, 4px -4px 0 #000,
         -4px  4px 0 #000, 4px  4px 0 #000,
@@ -288,7 +290,6 @@
     }
     .fortune-title .ft-line{
       display:block; width:100%;
-      word-break:normal; line-break:strict; overflow-wrap:anywhere;
     }
     @keyframes title-pulse{
       from{transform:scale(1) rotate(-.3deg);}
@@ -303,7 +304,7 @@
         -2px -2px 0 #000, 2px -2px 0 #000,
         -2px  2px 0 #000, 2px  2px 0 #000,
          4px  4px 0 #ff1493;
-      animation:kansai-wobble .9s infinite alternate; word-break:keep-all;
+      animation:kansai-wobble .9s infinite alternate;
     }
     @keyframes kansai-wobble{
       from{transform:scale(1) rotate(-2.5deg)}to{transform:scale(1.07) rotate(2.5deg)}
@@ -319,7 +320,6 @@
       font-size:clamp(1.4rem,5.5vw,2.1rem); font-weight:900;
       color:#cc0055; text-align:center;
       box-shadow:5px 5px 0 #000,0 0 18px #ff149344;
-      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
     }
     .tsukkomi::before{content:'💬 ';font-size:.8em;}
 
@@ -352,9 +352,6 @@
       line-height: 2.8;
       box-shadow: 5px 8px 24px rgba(0,0,0,.45);
       width: 100%;
-      word-break: keep-all;
-      line-break: strict;
-      overflow-wrap: break-word;
       white-space: normal;
       text-align: left;
       position: relative;
@@ -391,7 +388,6 @@
     .fortune-body {
       font-size:clamp(1.15rem,4.5vw,1.4rem); line-height:2.4;
       color:#fff; margin:0 0 1.4rem;
-      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
       font-weight:normal; text-align:left;
       background:rgba(0,0,0,.5); border-radius:12px;
       padding:1.4rem 1.6rem; border-left:4px solid #ffd700;
@@ -430,7 +426,7 @@
     .lucky-label{font-size:1rem;color:#ff9fcc;letter-spacing:1px;text-align:center;margin-top:.2rem;}
     .lucky-value{
       font-size:clamp(1.1rem,4.5vw,1.35rem); color:#fff200;
-      font-weight:900; text-align:center; word-break:keep-all; line-break:strict; overflow-wrap:break-word;
+      font-weight:900; text-align:center;
       text-shadow:1px 1px 0 #000,0 0 8px #ff1493;
     }
 
@@ -442,7 +438,6 @@
       font-weight:bold; color:#4ade80; text-align:center;
       line-height:2.0; margin-bottom:1.2rem;
       text-shadow:1px 1px 0 #000; box-shadow:4px 4px 0 #000;
-      word-break:keep-all; line-break:strict; overflow-wrap:break-word;
     }
     .positive-msg .pos-label{
       font-size:.78rem; color:#4ade8077; letter-spacing:3px;
