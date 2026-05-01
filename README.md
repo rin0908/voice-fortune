@@ -23,6 +23,39 @@ python -m http.server 8765
 
 ---
 
+## 【コピペ用】書き換えなし（このプロジェクト名のとき）
+
+**自分のGitHubが `rin0908` で、リポジトリ名が `voice-fortune` の場合だけ**、下は **そのままコピー＆貼り付けでOK** です（中身を編集しないでください）。
+
+### みんなに見せるページの住所（ブラウザのアドレス欄用）
+
+```text
+https://rin0908.github.io/voice-fortune/
+```
+
+### Git Bash で「フォルダに入る」だけ
+
+```bash
+cd /c/Users/heart/voice-fortune
+```
+
+### コードをGitHubに送る（まだ送っていない／やり直したいとき）
+
+**1行ずつ** 順に実行します。`remote remove` でエラーが出ても **気にせず次へ** 進んでください。
+
+```bash
+cd /c/Users/heart/voice-fortune
+git remote remove origin
+git remote add origin https://github.com/rin0908/voice-fortune.git
+git push -u origin main
+```
+
+※ `git remote remove origin` が **`No such remote`** と言ったら、**その行だけ失敗**です。**次の行から続けて大丈夫**です。
+
+※ **すでに push まで終わっている**人は、上の **3行（remove / add / push）はもう不要**です。
+
+---
+
 ## たくさんの人に配る（無料：GitHub Pages）
 
 ### 事前チェック（重要）
